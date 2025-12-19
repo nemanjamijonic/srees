@@ -1,0 +1,6 @@
+@SREES.API_HostAddress = http://localhost:5057
+
+GET {{SREES.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

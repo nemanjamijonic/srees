@@ -1,0 +1,74 @@
+# ====================
+# .NET Core / ASP.NET
+# ====================
+
+## Build output
+bin/
+obj/
+out/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider
+.idea/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## ASP.NET temp files
+wwwroot/lib/
+wwwroot/packages/
+appsettings*.json
+appsettings.Development.json
+
+## Others
+*.db
+*.log
+*.vsix
+
+# ====================
+# Angular / Node
+# ====================
+
+# Node modules
+node_modules/
+
+# Angular build output
+dist/
+dist-*/
+out-tsc/
+tmp/
+temp/
+
+# Angular environment files (if sensitive)
+src/environments/*.ts
+
+# NPM logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Angular IDE
+.angular/
+.angular/cache/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
