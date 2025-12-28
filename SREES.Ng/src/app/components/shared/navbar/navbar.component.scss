@@ -1,0 +1,88 @@
+.navbar {
+  background-color: var(--primary-dark);
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navbar-menu a {
+  color: var(--light-gray);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.navbar-menu a:hover,
+.navbar-menu a.active {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  color: var(--light-gray);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+  min-width: 200px;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu a {
+  display: block;
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.dropdown-menu a:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu a:hover {
+  background-color: var(--light-gray);
+}
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  color: var(--light-gray);
+  font-weight: 500;
+}

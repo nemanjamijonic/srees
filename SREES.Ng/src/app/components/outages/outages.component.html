@@ -1,0 +1,63 @@
+<div class="outages-container">
+  <div class="header">
+    <h2>Prekidi napajanja</h2>
+    <button class="btn btn-primary" (click)="showCreateForm = !showCreateForm">
+      {{ showCreateForm ? 'Otkaži' : 'Dodaj prekid' }}
+    </button>
+  </div>
+
+  <div *ngIf="showCreateForm" class="create-form">
+    <h3>Novi prekid</h3>
+    <form (ngSubmit)="createOutage()">
+      <div class="form-group">
+        <label>User ID:</label>
+        <input type="number" [(ngModel)]="newOutage.userId" name="userId" required>
+      </div>
+      <div class="form-group">
+        <label>Region ID:</label>
+        <input type="number" [(ngModel)]="newOutage.regionId" name="regionId" required>
+      </div>
+      <div class="form-group">
+        <label>Opis:</label>
+        <textarea [(ngModel)]="newOutage.description" name="description" required></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Kreiraj</button>
+        <button type="button" class="btn btn-secondary" (click)="resetForm()">Otkaži</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="loading" class="loading">Učitavanje...</div>
+
+  <div *ngIf="!loading" class="outages-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Opis</th>
+          <th>Status</th>
+          <th>Kreiran</th>
+          <th>Rešen</th>
+          <th>Akcije</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let outage of outages">
+          <td>{{ outage.id }}</td>
+          <td>{{ outage.description }}</td>
+          <td>
+            <select (change)="updateStatus(outage.id, $event)" [value]="outage.outageStatus">
+              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+            </select>
+          </td>
+          <td>{{ outage.createdAt | date:'short' }}</td>
+          <td>{{ outage.resolvedAt ? (outage.resolvedAt | date:'short') : '-' }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" (click)="deleteOutage(outage.id)">Obriši</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

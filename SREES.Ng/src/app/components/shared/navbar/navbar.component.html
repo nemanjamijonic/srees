@@ -1,0 +1,34 @@
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-brand">
+      <h2>SREES</h2>
+    </div>
+    
+    <div class="navbar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/network-map" routerLinkActive="active">Network Map</a>
+      <a routerLink="/outages" routerLinkActive="active">Outages</a>
+      <a routerLink="/faults" routerLinkActive="active">Faults</a>
+      
+      <!-- Customer only -->
+      <a routerLink="/report-fault" routerLinkActive="active" *ngIf="userRole === 'customer'">Report Fault</a>
+      
+      <!-- Admin only -->
+      <div class="dropdown" *ngIf="userRole === 'admin'">
+        <span class="dropdown-toggle">Admin</span>
+        <div class="dropdown-menu">
+          <a routerLink="/admin/network">Network Management</a>
+          <a routerLink="/admin/users">User Management</a>
+        </div>
+      </div>
+      
+      <a routerLink="/history" routerLinkActive="active">History</a>
+    </div>
+    
+    <div class="navbar-auth">
+      <span *ngIf="isLoggedIn" class="user-info">{{ username }}</span>
+      <button *ngIf="!isLoggedIn" class="btn btn-primary" routerLink="/login">Login</button>
+      <button *ngIf="isLoggedIn" class="btn btn-secondary" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>

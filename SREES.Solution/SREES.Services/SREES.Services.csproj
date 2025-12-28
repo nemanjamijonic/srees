@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SREES.BLL\SREES.BLL.csproj" />
+    <ProjectReference Include="..\SREES.DAL\SREES.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
