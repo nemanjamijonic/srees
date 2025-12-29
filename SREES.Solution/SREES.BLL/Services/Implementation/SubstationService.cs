@@ -69,10 +69,7 @@ namespace SREES.BLL.Services.Implementation
                     Latitude = substationDataIn.Latitude,
                     Longitude = substationDataIn.Longitude,
                     Name = substationDataIn.Name,
-                    RegionId = substationDataIn.RegionId,
-                    Guid = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow,
-                    LastUpdateTime = DateTime.UtcNow
+                    RegionId = substationDataIn.RegionId
                 };
 
                 await _uow.GetSubstationRepository().AddAsync(substation);
@@ -106,7 +103,7 @@ namespace SREES.BLL.Services.Implementation
                 substation.Longitude = substationDataIn.Longitude;
                 substation.Name = substationDataIn.Name;
                 substation.RegionId = substationDataIn.RegionId;
-                substation.LastUpdateTime = DateTime.UtcNow;
+                substation.LastUpdateTime = DateTime.Now;
 
                 await _uow.CompleteAsync();
 

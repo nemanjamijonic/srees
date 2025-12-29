@@ -36,6 +36,21 @@ namespace SREES.BLL.Services.Implementation
             }
         }
 
+        public async Task<ResponsePackage<List<RegionSelectDataOut>>> GetAllRegionsForSelect()
+        {
+            try
+            {
+                var regions = await _uow.GetRegionRepository().GetAllAsync();
+                var regionSelectList = _mapper.Map<List<RegionSelectDataOut>>(regions.ToList());
+                return new ResponsePackage<List<RegionSelectDataOut>>(regionSelectList, "Regije za select uspešno preuzete");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju regija za select");
+                return new ResponsePackage<List<RegionSelectDataOut>>(null, "Greška pri preuzimanju regija za select");
+            }
+        }
+
         public async Task<ResponsePackage<RegionDataOut?>> GetRegionById(int id)
         {
             try
@@ -89,6 +104,7 @@ namespace SREES.BLL.Services.Implementation
                 region.Name = regionDataIn.Name;
                 region.Latitude = regionDataIn.Latitude;
                 region.Longitude = regionDataIn.Longitude;
+                region.LastUpdateTime = DateTime.Now; // CET vreme (lokalno vreme servera)
 
                 await _uow.CompleteAsync();
 

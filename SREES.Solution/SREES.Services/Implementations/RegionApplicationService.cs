@@ -19,6 +19,11 @@ namespace SREES.Services.Implementations
             return await _regionService.GetAllRegions();
         }
 
+        public async Task<ResponsePackage<List<RegionSelectDataOut>>> GetAllRegionsForSelect()
+        {
+            return await _regionService.GetAllRegionsForSelect();
+        }
+
         public async Task<ResponsePackage<RegionDataOut?>> GetRegionById(int id)
         {
             return await _regionService.GetRegionById(id);

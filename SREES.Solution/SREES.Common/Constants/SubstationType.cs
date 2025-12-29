@@ -4,6 +4,7 @@
     {
         TransmissionSubstation,
         InjectionSubstation,
-        DistributionSubstation
+        DistributionSubstation,
+        BulkSupply
     }
 }

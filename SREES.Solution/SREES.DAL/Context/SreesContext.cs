@@ -87,11 +87,11 @@ namespace SREES.DAL.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt)
-                    .HasDefaultValueSql("GETUTCDATE()")
+                    .HasDefaultValueSql("GETDATE()")
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.LastUpdateTime)
-                    .HasDefaultValueSql("GETUTCDATE()")
+                    .HasDefaultValueSql("GETDATE()")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.IsDeleted)
@@ -136,11 +136,11 @@ namespace SREES.DAL.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt)
-                    .HasDefaultValueSql("GETUTCDATE()")
+                    .HasDefaultValueSql("GETDATE()")
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.LastUpdateTime)
-                    .HasDefaultValueSql("GETUTCDATE()")
+                    .HasDefaultValueSql("GETDATE()")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.IsDeleted)
@@ -190,11 +190,11 @@ namespace SREES.DAL.Context
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt)
-                    .HasDefaultValueSql("GETUTCDATE()")
+                    .HasDefaultValueSql("GETDATE()")
                     .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.LastUpdateTime)
-                    .HasDefaultValueSql("GETUTCDATE()")
+                    .HasDefaultValueSql("GETDATE()")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.IsDeleted)
@@ -226,6 +226,10 @@ namespace SREES.DAL.Context
         public virtual DbSet<Outage> Outages { get; set; }
         public virtual DbSet<Substation> Substations { get; set; }
         public virtual DbSet<Region> Regions { get; set; }
+        public virtual DbSet<Building> Buildings { get; set; }
+        public virtual DbSet<Pole> Poles { get; set; }
+        public virtual DbSet<Feeder> Feeders { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
 
     }
 }

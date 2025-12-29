@@ -1,0 +1,174 @@
+.modal.show {
+  display: block !important;
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
+}
+
+// Enhanced table styles
+.table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  thead th {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 15px 12px;
+  }
+
+  tbody tr {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(27, 152, 224, 0.05);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  td {
+    vertical-align: middle;
+    padding: 12px;
+    border-bottom: 1px solid #e8f1f2;
+  }
+
+  .table-dark th {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue)) !important;
+  }
+}
+
+// Action buttons styling
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+
+  .btn {
+    border-radius: 6px;
+    padding: 6px 10px;
+    transition: all 0.3s ease;
+    border-width: 1.5px;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+
+  .btn-outline-primary {
+    &:hover {
+      background-color: var(--primary-blue);
+      border-color: var(--primary-blue);
+      color: white;
+    }
+  }
+
+  .btn-outline-danger {
+    &:hover {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+  }
+}
+
+// Card styling improvements  
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(19, 41, 61, 0.1);
+  
+  .card-header {
+    background: linear-gradient(135deg, var(--light-gray), #ffffff);
+    border-bottom: 2px solid var(--accent-blue);
+    border-radius: 12px 12px 0 0;
+    padding: 20px;
+
+    h4 {
+      color: var(--primary-dark);
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(27, 152, 224, 0.3);
+      }
+    }
+  }
+}
+
+// Badge styling
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+  
+  &.bg-info {
+    background: linear-gradient(135deg, var(--accent-blue), var(--secondary-blue)) !important;
+    color: white;
+  }
+  
+  &.bg-success {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white;
+  }
+}
+
+// Form styling improvements
+.form-select:disabled {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.text-muted {
+  font-size: 0.85rem;
+  margin-top: 4px;
+  display: block;
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 2px;
+    
+    .btn {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+    }
+  }
+
+  .table thead th {
+    font-size: 0.75rem;
+    padding: 10px 8px;
+  }
+
+  .table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+}

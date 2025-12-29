@@ -10,6 +10,7 @@ namespace SREES.BLL.Mappings
         {
             CreateMap<Region, RegionDataOut>().ReverseMap();
             CreateMap<RegionDataIn, Region>();
+            CreateMap<Region, RegionSelectDataOut>();
         }
     }
 }
