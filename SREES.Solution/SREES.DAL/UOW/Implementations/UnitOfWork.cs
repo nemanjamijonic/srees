@@ -13,6 +13,7 @@ namespace SREES.DAL.UOW.Implementations
         private IOutageRepository? OutageRepository;
         private IRegionRepository? RegionRepository;
         private ISubstationRepository? SubstationRepository;
+        private IPoleRepository? PoleRepository;
 
         public UnitOfWork(SreesContext context)
         {
@@ -55,6 +56,11 @@ namespace SREES.DAL.UOW.Implementations
         public ISubstationRepository GetSubstationRepository()
         {
             return SubstationRepository ??= new SubstationRepository(_context!);
+        }
+
+        public IPoleRepository GetPoleRepository()
+        {
+            return PoleRepository ??= new PoleRepository(_context!);
         }
 
         protected virtual async ValueTask DisposeAsyncCore()

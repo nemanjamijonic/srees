@@ -9,5 +9,6 @@ namespace SREES.DAL.UOW.Interafaces
         IOutageRepository GetOutageRepository();
         IRegionRepository GetRegionRepository();
         ISubstationRepository GetSubstationRepository();
+        IPoleRepository GetPoleRepository();
     }
 }

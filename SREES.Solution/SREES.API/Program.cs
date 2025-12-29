@@ -50,7 +50,7 @@ namespace SREES.API
             ));
 
             // AutoMapper - Dodaj sve profile
-            builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile));
+            builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile));
 
             RegisterRepositories(builder);
             RegisterBllServices(builder);
@@ -87,6 +87,7 @@ namespace SREES.API
             builder.Services.AddScoped<IOutageRepository, OutageRepository>();
             builder.Services.AddScoped<IRegionRepository, RegionRepository>();
             builder.Services.AddScoped<ISubstationRepository, SubstationRepository>();
+            builder.Services.AddScoped<IPoleRepository, PoleRepository>();
         }
 
         private static void RegisterBllServices(WebApplicationBuilder builder)
@@ -96,6 +97,7 @@ namespace SREES.API
             builder.Services.AddScoped<IOutageService, OutageService>();
             builder.Services.AddScoped<IRegionService, RegionService>();
             builder.Services.AddScoped<ISubstationService, SubstationService>();
+            builder.Services.AddScoped<IPoleService, PoleService>();
         }
 
         private static void RegisterApplicationServices(WebApplicationBuilder builder)
@@ -104,6 +106,7 @@ namespace SREES.API
             builder.Services.AddScoped<IOutageApplicationService, OutageApplicationService>();
             builder.Services.AddScoped<IRegionApplicationService, RegionApplicationService>();
             builder.Services.AddScoped<ISubstationApplicationService, SubstationApplicationService>();
+            builder.Services.AddScoped<IPoleApplicationService, PoleApplicationService>();
         }
 
         private static void MigrateDatabase(WebApplication app)

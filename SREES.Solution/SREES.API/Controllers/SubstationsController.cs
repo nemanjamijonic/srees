@@ -63,7 +63,7 @@ namespace SREES.API.Controllers
         public async Task<ActionResult<ResponsePackage<string>>> DeleteSubstation(int id)
         {
             var result = await _substationApplicationService.DeleteSubstation(id);
-            if (result.Data == null && result.Message.Contains("nije prona?ena"))
+            if (result.Data == null && result.Message!.Contains("nije prona?ena"))
                 return NotFound(result);
 
             return Ok(result);

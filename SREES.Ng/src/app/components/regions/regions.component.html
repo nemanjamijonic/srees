@@ -15,8 +15,7 @@
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
+                  <th>Coordinates</th>
                   <th>Created</th>
                   <th>Last Updated At</th>
                   <th class="text-center">Actions</th>
@@ -26,8 +25,7 @@
                 <tr *ngFor="let region of regions">
                   <td><strong>#{{ region.id }}</strong></td>
                   <td>{{ region.name }}</td>
-                  <td>{{ region.latitude | number:'1.2-2' }}</td>
-                  <td>{{ region.longitude | number:'1.2-2' }}</td>
+                  <td>{{ region.latitude | number:'1.2-2' }}, {{ region.longitude | number:'1.2-2' }}</td>
                   <td>{{ region.createdAt | date:'short' }}</td>
                   <td>{{ region.lastUpdateTime | date:'short' }}</td>
                   <td class="text-center">

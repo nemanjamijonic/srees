@@ -70,7 +70,7 @@ namespace SREES.API.Controllers
         public async Task<ActionResult<ResponsePackage<string>>> DeleteRegion(int id)
         {
             var result = await _regionApplicationService.DeleteRegion(id);
-            if (result.Data == null && result.Message.Contains("nije pronađena"))
+            if (result.Data == null && result.Message!.Contains("nije pronađena"))
                 return NotFound(result);
 
             return Ok(result);

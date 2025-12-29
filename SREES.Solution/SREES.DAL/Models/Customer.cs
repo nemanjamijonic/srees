@@ -1,4 +1,5 @@
-﻿using SREES.Common.Models;
+﻿using SREES.Common.Constants;
+using SREES.Common.Models;
 
 namespace SREES.DAL.Models
 {
@@ -10,5 +11,6 @@ namespace SREES.DAL.Models
         public int? BuildingId { get; set; }
         public Building? Building { get; set; }
         public bool IsActive { get; set; }
+        public CustomerType CustomerType { get; set; }
     }
 }

@@ -8,10 +8,11 @@ import { NetworkMapComponent } from './components/network-map/network-map.compon
 import { OutagesComponent } from './components/outages/outages.component';
 import { RegionsComponent } from './components/regions/regions.component';
 import { SubstationsComponent } from './components/substations/substations.component';
+import { PolesComponent } from './components/poles/poles.component';
 import { LayoutComponent } from './components/layout/layout.component';
 
 const routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' as const },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' as const },
   // { path: 'login', component: LoginComponent },
   // { path: 'register', component: RegisterComponent },
   {
@@ -21,8 +22,9 @@ const routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'network-map', component: NetworkMapComponent },
       { path: 'outages', component: OutagesComponent },
-      { path: 'regions', component: RegionsComponent },
-      { path: 'substations', component: SubstationsComponent }
+      { path: 'crud/regions', component: RegionsComponent },
+      { path: 'crud/substations', component: SubstationsComponent },
+      { path: 'crud/poles', component: PolesComponent }
     ]
   },
   { path: '**', redirectTo: '/dashboard' }

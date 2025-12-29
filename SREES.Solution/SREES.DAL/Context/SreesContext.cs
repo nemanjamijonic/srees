@@ -220,6 +220,59 @@ namespace SREES.DAL.Context
 
                 entity.ToTable("Outages", schema: "dbo");
             });
+
+            // Konfiguracija Pole entiteta
+            modelBuilder.Entity<Pole>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Latitude)
+                    .HasPrecision(10, 6);
+
+                entity.Property(e => e.Longitude)
+                    .HasPrecision(10, 6);
+
+                entity.Property(e => e.Address)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.PoleType)
+                    .HasConversion<int>(); // Promenjeno sa string na int
+
+                entity.Property(e => e.Guid)
+                    .HasDefaultValueSql("NEWID()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(e => e.RegionId)
+                    .HasName("IX_Pole_RegionId");
+
+                entity.HasIndex(e => e.PoleType)
+                    .HasName("IX_Pole_Type");
+
+                entity.HasIndex(e => e.IsDeleted)
+                    .HasName("IX_Pole_IsDeleted");
+
+                // Foreign key relationship
+                entity.HasOne(p => p.Region)
+                    .WithMany()
+                    .HasForeignKey(p => p.RegionId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.ToTable("Poles", schema: "dbo");
+            });
         }
 
         public virtual DbSet<User> Users { get; set; }

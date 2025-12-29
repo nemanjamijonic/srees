@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SREES.DAL.Context;
 
@@ -11,9 +12,11 @@ using SREES.DAL.Context;
 namespace SREES.DAL.Migrations
 {
     [DbContext(typeof(SreesContext))]
-    partial class SreesContextModelSnapshot : ModelSnapshot
+    [Migration("20251229011829_ChangedPoleTypeFromStringToInt")]
+    partial class ChangedPoleTypeFromStringToInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
