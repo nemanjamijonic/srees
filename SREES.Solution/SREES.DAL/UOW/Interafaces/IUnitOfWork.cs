@@ -10,5 +10,8 @@ namespace SREES.DAL.UOW.Interafaces
         IRegionRepository GetRegionRepository();
         ISubstationRepository GetSubstationRepository();
         IPoleRepository GetPoleRepository();
+        IBuildingRepository GetBuildingRepository();
+        IFeederRepository GetFeederRepository();
+        ICustomerRepository GetCustomerRepository();
     }
 }

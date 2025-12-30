@@ -22,6 +22,11 @@ namespace SREES.Services.Implementations
             return await _substationService.GetAllSubstations();
         }
 
+        public async Task<ResponsePackage<List<SubstationSelectDataOut>>> GetAllSubstationsForSelect()
+        {
+            return await _substationService.GetAllSubstationsForSelect();
+        }
+
         public async Task<ResponsePackage<SubstationDataOut?>> GetSubstationById(int id)
         {
             return await _substationService.GetSubstationById(id);

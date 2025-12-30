@@ -10,6 +10,7 @@ namespace SREES.BLL.Mappings
         {
             CreateMap<Substation, SubstationDataOut>().ReverseMap();
             CreateMap<SubstationDataIn, Substation>();
+            CreateMap<Substation, SubstationSelectDataOut>();
         }
     }
 }

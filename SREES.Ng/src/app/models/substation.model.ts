@@ -17,7 +17,10 @@ export interface CreateSubstationRequest {
   name: string;
   regionId: number;
 }
-
+export interface SubstationSelectOption {
+  id: number;
+  name: string;
+}
 export interface UpdateSubstationRequest {
   substationType: number;
   latitude: number;

@@ -9,6 +9,9 @@ import { OutagesComponent } from './components/outages/outages.component';
 import { RegionsComponent } from './components/regions/regions.component';
 import { SubstationsComponent } from './components/substations/substations.component';
 import { PolesComponent } from './components/poles/poles.component';
+import { BuildingsComponent } from './components/buildings/buildings.component';
+import { FeedersComponent } from './components/feeders/feeders.component';
+import { CustomersComponent } from './components/customers/customers.component';
 import { LayoutComponent } from './components/layout/layout.component';
 
 const routes = [
@@ -24,7 +27,10 @@ const routes = [
       { path: 'outages', component: OutagesComponent },
       { path: 'crud/regions', component: RegionsComponent },
       { path: 'crud/substations', component: SubstationsComponent },
-      { path: 'crud/poles', component: PolesComponent }
+      { path: 'crud/poles', component: PolesComponent },
+      { path: 'crud/buildings', component: BuildingsComponent },
+      { path: 'crud/feeders', component: FeedersComponent },
+      { path: 'crud/customers', component: CustomersComponent }
     ]
   },
   { path: '**', redirectTo: '/dashboard' }

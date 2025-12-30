@@ -239,7 +239,7 @@ namespace SREES.DAL.Context
                     .HasMaxLength(500);
 
                 entity.Property(e => e.PoleType)
-                    .HasConversion<int>(); // Promenjeno sa string na int
+                    .HasConversion<int>();
 
                 entity.Property(e => e.Guid)
                     .HasDefaultValueSql("NEWID()")
@@ -272,6 +272,173 @@ namespace SREES.DAL.Context
                     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.ToTable("Poles", schema: "dbo");
+            });
+
+            // Konfiguracija Building entiteta
+            modelBuilder.Entity<Building>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Latitude)
+                    .HasPrecision(10, 6);
+
+                entity.Property(e => e.Longitude)
+                    .HasPrecision(10, 6);
+
+                entity.Property(e => e.OwnerName)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Address)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.Guid)
+                    .HasDefaultValueSql("NEWID()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(e => e.RegionId)
+                    .HasName("IX_Building_RegionId");
+
+                entity.HasIndex(e => e.PoleId)
+                    .HasName("IX_Building_PoleId");
+
+                entity.HasIndex(e => e.IsDeleted)
+                    .HasName("IX_Building_IsDeleted");
+
+                // Foreign key relationships
+                entity.HasOne(b => b.Region)
+                    .WithMany()
+                    .HasForeignKey(b => b.RegionId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(b => b.Pole)
+                    .WithMany()
+                    .HasForeignKey(b => b.PoleId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.ToTable("Buildings", schema: "dbo");
+            });
+
+            // Konfiguracija Feeder entiteta
+            modelBuilder.Entity<Feeder>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.FeederType)
+                    .HasConversion<int>();
+
+                entity.Property(e => e.Guid)
+                    .HasDefaultValueSql("NEWID()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(e => e.SubstationId)
+                    .HasName("IX_Feeder_SubstationId");
+
+                entity.HasIndex(e => e.FeederType)
+                    .HasName("IX_Feeder_Type");
+
+                entity.HasIndex(e => e.IsDeleted)
+                    .HasName("IX_Feeder_IsDeleted");
+
+                // Foreign key relationship
+                entity.HasOne(f => f.Substation)
+                    .WithMany()
+                    .HasForeignKey(f => f.SubstationId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.ToTable("Feeders", schema: "dbo");
+            });
+
+            // Konfiguracija Customer entiteta
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.FirstName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(e => e.LastName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(e => e.Address)
+                    .HasMaxLength(500)
+                    .IsRequired();
+
+                entity.Property(e => e.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.CustomerType)
+                    .HasConversion<int>();
+
+                entity.Property(e => e.Guid)
+                    .HasDefaultValueSql("NEWID()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(e => e.BuildingId)
+                    .HasName("IX_Customer_BuildingId");
+
+                entity.HasIndex(e => e.CustomerType)
+                    .HasName("IX_Customer_Type");
+
+                entity.HasIndex(e => e.IsActive)
+                    .HasName("IX_Customer_IsActive");
+
+                entity.HasIndex(e => e.IsDeleted)
+                    .HasName("IX_Customer_IsDeleted");
+
+                // Foreign key relationship
+                entity.HasOne(c => c.Building)
+                    .WithMany()
+                    .HasForeignKey(c => c.BuildingId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.ToTable("Customers", schema: "dbo");
             });
         }
 

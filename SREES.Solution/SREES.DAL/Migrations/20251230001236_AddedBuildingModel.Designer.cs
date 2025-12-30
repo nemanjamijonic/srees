@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SREES.DAL.Context;
 
@@ -11,9 +12,11 @@ using SREES.DAL.Context;
 namespace SREES.DAL.Migrations
 {
     [DbContext(typeof(SreesContext))]
-    partial class SreesContextModelSnapshot : ModelSnapshot
+    [Migration("20251230001236_AddedBuildingModel")]
+    partial class AddedBuildingModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,65 +99,42 @@ namespace SREES.DAL.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("BuildingId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CustomerType")
                         .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastUpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuildingId")
-                        .HasDatabaseName("IX_Customer_BuildingId");
+                    b.HasIndex("BuildingId");
 
-                    b.HasIndex("CustomerType")
-                        .HasDatabaseName("IX_Customer_Type");
-
-                    b.HasIndex("IsActive")
-                        .HasDatabaseName("IX_Customer_IsActive");
-
-                    b.HasIndex("IsDeleted")
-                        .HasDatabaseName("IX_Customer_IsDeleted");
-
-                    b.ToTable("Customers", "dbo");
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("SREES.DAL.Models.Feeder", b =>
@@ -166,31 +146,22 @@ namespace SREES.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("FeederType")
                         .HasColumnType("int");
 
                     b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastUpdateTime")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SubstationId")
                         .HasColumnType("int");
@@ -200,16 +171,9 @@ namespace SREES.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FeederType")
-                        .HasDatabaseName("IX_Feeder_Type");
+                    b.HasIndex("SubstationId");
 
-                    b.HasIndex("IsDeleted")
-                        .HasDatabaseName("IX_Feeder_IsDeleted");
-
-                    b.HasIndex("SubstationId")
-                        .HasDatabaseName("IX_Feeder_SubstationId");
-
-                    b.ToTable("Feeders", "dbo");
+                    b.ToTable("Feeders");
                 });
 
             modelBuilder.Entity("SREES.DAL.Models.Outage", b =>
@@ -533,8 +497,7 @@ namespace SREES.DAL.Migrations
                 {
                     b.HasOne("SREES.DAL.Models.Building", "Building")
                         .WithMany()
-                        .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("BuildingId");
 
                     b.Navigation("Building");
                 });
@@ -543,8 +506,7 @@ namespace SREES.DAL.Migrations
                 {
                     b.HasOne("SREES.DAL.Models.Substation", "Substation")
                         .WithMany()
-                        .HasForeignKey("SubstationId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("SubstationId");
 
                     b.Navigation("Substation");
                 });

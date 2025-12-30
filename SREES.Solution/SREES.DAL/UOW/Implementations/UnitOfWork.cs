@@ -14,6 +14,9 @@ namespace SREES.DAL.UOW.Implementations
         private IRegionRepository? RegionRepository;
         private ISubstationRepository? SubstationRepository;
         private IPoleRepository? PoleRepository;
+        private IBuildingRepository? BuildingRepository;
+        private IFeederRepository? FeederRepository;
+        private ICustomerRepository? CustomerRepository;
 
         public UnitOfWork(SreesContext context)
         {
@@ -61,6 +64,21 @@ namespace SREES.DAL.UOW.Implementations
         public IPoleRepository GetPoleRepository()
         {
             return PoleRepository ??= new PoleRepository(_context!);
+        }
+
+        public IBuildingRepository GetBuildingRepository()
+        {
+            return BuildingRepository ??= new BuildingRepository(_context!);
+        }
+
+        public IFeederRepository GetFeederRepository()
+        {
+            return FeederRepository ??= new FeederRepository(_context!);
+        }
+
+        public ICustomerRepository GetCustomerRepository()
+        {
+            return CustomerRepository ??= new CustomerRepository(_context!);
         }
 
         protected virtual async ValueTask DisposeAsyncCore()

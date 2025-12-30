@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Substations;
 using SREES.Services.Interfaces;
@@ -20,6 +20,13 @@ namespace SREES.API.Controllers
         public async Task<ActionResult<ResponsePackage<List<SubstationDataOut>>>> GetAllSubstations()
         {
             var result = await _substationApplicationService.GetAllSubstations();
+            return Ok(result);
+        }
+
+        [HttpGet("getAllForSelect")]
+        public async Task<ActionResult<ResponsePackage<List<SubstationSelectDataOut>>>> GetAllSubstationsForSelect()
+        {
+            var result = await _substationApplicationService.GetAllSubstationsForSelect();
             return Ok(result);
         }
 
@@ -63,7 +70,7 @@ namespace SREES.API.Controllers
         public async Task<ActionResult<ResponsePackage<string>>> DeleteSubstation(int id)
         {
             var result = await _substationApplicationService.DeleteSubstation(id);
-            if (result.Data == null && result.Message!.Contains("nije prona?ena"))
+            if (result.Data == null && result.Message!.Contains("nije pronađena"))
                 return NotFound(result);
 
             return Ok(result);

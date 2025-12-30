@@ -50,7 +50,7 @@ namespace SREES.API
             ));
 
             // AutoMapper - Dodaj sve profile
-            builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile));
+            builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile), typeof(BuildingProfile), typeof(FeederProfile), typeof(CustomerProfile));
 
             RegisterRepositories(builder);
             RegisterBllServices(builder);
@@ -88,6 +88,9 @@ namespace SREES.API
             builder.Services.AddScoped<IRegionRepository, RegionRepository>();
             builder.Services.AddScoped<ISubstationRepository, SubstationRepository>();
             builder.Services.AddScoped<IPoleRepository, PoleRepository>();
+            builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
+            builder.Services.AddScoped<IFeederRepository, FeederRepository>();
+            builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
         }
 
         private static void RegisterBllServices(WebApplicationBuilder builder)
@@ -98,6 +101,9 @@ namespace SREES.API
             builder.Services.AddScoped<IRegionService, RegionService>();
             builder.Services.AddScoped<ISubstationService, SubstationService>();
             builder.Services.AddScoped<IPoleService, PoleService>();
+            builder.Services.AddScoped<IBuildingService, BuildingService>();
+            builder.Services.AddScoped<IFeederService, FeederService>();
+            builder.Services.AddScoped<ICustomerService, CustomerService>();
         }
 
         private static void RegisterApplicationServices(WebApplicationBuilder builder)
@@ -107,6 +113,9 @@ namespace SREES.API
             builder.Services.AddScoped<IRegionApplicationService, RegionApplicationService>();
             builder.Services.AddScoped<ISubstationApplicationService, SubstationApplicationService>();
             builder.Services.AddScoped<IPoleApplicationService, PoleApplicationService>();
+            builder.Services.AddScoped<IBuildingApplicationService, BuildingApplicationService>();
+            builder.Services.AddScoped<IFeederApplicationService, FeederApplicationService>();
+            builder.Services.AddScoped<ICustomerApplicationService, CustomerApplicationService>();
         }
 
         private static void MigrateDatabase(WebApplication app)

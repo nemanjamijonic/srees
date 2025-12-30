@@ -6,6 +6,7 @@ namespace SREES.Services.Interfaces
     public interface ISubstationApplicationService
     {
         Task<ResponsePackage<List<SubstationDataOut>>> GetAllSubstations();
+        Task<ResponsePackage<List<SubstationSelectDataOut>>> GetAllSubstationsForSelect();
         Task<ResponsePackage<SubstationDataOut?>> GetSubstationById(int id);
         Task<ResponsePackage<SubstationDataOut?>> CreateSubstation(SubstationDataIn substationDataIn);
         Task<ResponsePackage<SubstationDataOut?>> UpdateSubstation(int id, SubstationDataIn substationDataIn);

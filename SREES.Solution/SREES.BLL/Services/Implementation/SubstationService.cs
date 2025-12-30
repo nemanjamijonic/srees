@@ -36,6 +36,21 @@ namespace SREES.BLL.Services.Implementation
             }
         }
 
+        public async Task<ResponsePackage<List<SubstationSelectDataOut>>> GetAllSubstationsForSelect()
+        {
+            try
+            {
+                var substations = await _uow.GetSubstationRepository().GetAllAsync();
+                var substationSelectList = _mapper.Map<List<SubstationSelectDataOut>>(substations.ToList());
+                return new ResponsePackage<List<SubstationSelectDataOut>>(substationSelectList, "Transformatorske stanice za select uspešno preuzete");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju transformatorskih stanica za select");
+                return new ResponsePackage<List<SubstationSelectDataOut>>(null, "Greška pri preuzimanju transformatorskih stanica za select");
+            }
+        }
+
         public async Task<ResponsePackage<SubstationDataOut?>> GetSubstationById(int id)
         {
             try

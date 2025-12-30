@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Substation, CreateSubstationRequest, UpdateSubstationRequest } from '../models/substation.model';
+import { Substation, CreateSubstationRequest, UpdateSubstationRequest, SubstationSelectOption } from '../models/substation.model';
 import { ApiResponse } from '../models/region.model';
 
 @Injectable({
@@ -14,6 +14,10 @@ export class SubstationService {
 
   getAll(): Observable<ApiResponse<Substation[]>> {
     return this.http.get<ApiResponse<Substation[]>>(this.apiUrl);
+  }
+
+  getAllForSelect(): Observable<ApiResponse<SubstationSelectOption[]>> {
+    return this.http.get<ApiResponse<SubstationSelectOption[]>>(`${this.apiUrl}/getAllForSelect`);
   }
 
   getById(id: number): Observable<ApiResponse<Substation>> {
