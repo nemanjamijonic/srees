@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using SREES.Common.Constants;
 using SREES.Common.Repositories.Implementations;
 using SREES.DAL.Context;
 using SREES.DAL.Models;
@@ -14,6 +16,15 @@ namespace SREES.DAL.Repository.Implementations
 
         public PoleRepository(SreesContext context) : base(context)
         {
+        }
+
+        public async Task<Dictionary<PoleType, int>> GetPoleCountByTypeAsync()
+        {
+            return await Context.Poles
+                .Where(p => !p.IsDeleted)
+                .GroupBy(p => p.PoleType)
+                .Select(g => new { Type = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Type, x => x.Count);
         }
     }
 }

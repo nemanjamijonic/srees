@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
 import { BuildingService } from '../../services/building.service';
-import { Customer, CreateCustomerRequest, UpdateCustomerRequest } from '../../models/customer.model';
+import { Customer, CreateCustomerRequest, UpdateCustomerRequest, CustomerFilterRequest } from '../../models/customer.model';
 import { BuildingSelectOption } from '../../models/building.model';
 
 @Component({
@@ -20,6 +20,29 @@ export class CustomersComponent implements OnInit {
   showDeleteModal = false;
   isEdit = false;
   selectedCustomer: Customer | null = null;
+  
+  // Expose Math to template
+  Math = Math;
+  
+  // Pagination properties
+  totalCount = 0;
+  totalPages = 0;
+  currentPage = 1;
+  pageSize = 1;
+  pages: number[] = [];
+
+  // Filter properties
+  filterRequest: CustomerFilterRequest = {
+    searchTerm: '',
+    customerType: undefined,
+    dateFrom: '',
+    dateTo: '',
+    pageNumber: 1,
+    pageSize: 10
+  };
+
+  // Applied filters for display
+  appliedFilters: Array<{label: string, value: string, key: string}> = [];
   
   customerForm: CreateCustomerRequest = {
     firstName: '',
@@ -41,9 +64,122 @@ export class CustomersComponent implements OnInit {
   }
 
   loadCustomers() {
-    this.customerService.getAll().subscribe(response => {
-      this.customers = response.data;
+    this.customerService.getFiltered(this.filterRequest).subscribe(response => {
+      this.customers = response.data.data;
+      this.totalCount = response.data.totalCount;
+      this.totalPages = response.data.totalPages;
+      this.currentPage = response.data.currentPage;
+      this.pageSize = response.data.pageSize;
+      this.updatePagination();
     });
+  }
+
+  applyFilters() {
+    this.filterRequest.pageNumber = 1;
+    this.currentPage = 1;
+    this.loadCustomers();
+    this.updateAppliedFilters();
+  }
+
+  clearFilters() {
+    this.filterRequest = {
+      searchTerm: '',
+      customerType: undefined,
+      dateFrom: '',
+      dateTo: '',
+      pageNumber: 1,
+      pageSize: 10
+    };
+    this.appliedFilters = [];
+    this.loadCustomers();
+  }
+
+  removeFilter(key: string) {
+    switch(key) {
+      case 'searchTerm':
+        this.filterRequest.searchTerm = '';
+        break;
+      case 'customerType':
+        this.filterRequest.customerType = undefined;
+        break;
+      case 'dateFrom':
+        this.filterRequest.dateFrom = '';
+        break;
+      case 'dateTo':
+        this.filterRequest.dateTo = '';
+        break;
+    }
+    this.applyFilters();
+  }
+
+  updateAppliedFilters() {
+    this.appliedFilters = [];
+    
+    if (this.filterRequest.searchTerm) {
+      this.appliedFilters.push({
+        label: 'Search',
+        value: this.filterRequest.searchTerm,
+        key: 'searchTerm'
+      });
+    }
+
+    if (this.filterRequest.customerType !== undefined && this.filterRequest.customerType !== null) {
+      this.appliedFilters.push({
+        label: 'Type',
+        value: this.getCustomerTypeName(this.filterRequest.customerType),
+        key: 'customerType'
+      });
+    }
+
+    if (this.filterRequest.dateFrom) {
+      this.appliedFilters.push({
+        label: 'From',
+        value: new Date(this.filterRequest.dateFrom).toLocaleDateString(),
+        key: 'dateFrom'
+      });
+    }
+
+    if (this.filterRequest.dateTo) {
+      this.appliedFilters.push({
+        label: 'To',
+        value: new Date(this.filterRequest.dateTo).toLocaleDateString(),
+        key: 'dateTo'
+      });
+    }
+  }
+
+  updatePagination() {
+    this.pages = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      this.pages.push(i);
+    }
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.filterRequest.pageNumber = page;
+      this.loadCustomers();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
   }
 
   loadBuildingOptions() {

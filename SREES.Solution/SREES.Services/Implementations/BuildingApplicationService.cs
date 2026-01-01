@@ -1,6 +1,7 @@
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Buildings;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.Services.Implementations
@@ -42,6 +43,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeleteBuilding(int id)
         {
             return await _buildingService.DeleteBuilding(id);
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetBuildingStatistics()
+        {
+            return await _buildingService.GetBuildingStatistics();
         }
     }
 }

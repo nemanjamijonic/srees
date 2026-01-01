@@ -13,10 +13,13 @@ import { Outage, CreateOutageRequest, OutageStatus } from '../../models/outage.m
 })
 export class OutagesComponent implements OnInit {
   outages: Outage[] = [];
-  loading = false;
-  showCreateForm = false;
+  showModal = false;
+  showDeleteModal = false;
+  isEdit = false;
+  selectedOutage: Outage | null = null;
+  selectedStatus: OutageStatus = 'Reported';
   
-  newOutage: CreateOutageRequest = {
+  outageForm: CreateOutageRequest = {
     userId: 0,
     regionId: 0,
     description: ''
@@ -31,57 +34,86 @@ export class OutagesComponent implements OnInit {
   }
 
   loadOutages(): void {
-    this.loading = true;
     this.outageService.getAllOutages().subscribe({
       next: (response) => {
-        console.log('Outages loaded:', response);
         this.outages = response.data;
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading outages:', error);
-        this.loading = false;
       }
     });
   }
 
-  createOutage(): void {
-    this.outageService.createOutage(this.newOutage).subscribe({
-      next: (response) => {
-        this.outages.push(response.data);
-        this.resetForm();
-      },
-      error: (error) => console.error('Error creating outage:', error)
-    });
+  openModal(): void {
+    this.isEdit = false;
+    this.outageForm = {
+      userId: 0,
+      regionId: 0,
+      description: ''
+    };
+    this.showModal = true;
   }
 
-  updateStatus(id: number, event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const newStatus = target.value as OutageStatus;
-    this.outageService.updateOutageStatus(id, { newStatus }).subscribe({
-      next: (response) => {
-        const index = this.outages.findIndex(o => o.id === id);
-        if (index !== -1) {
-          this.outages[index] = response.data;
-        }
-      },
-      error: (error) => console.error('Error updating status:', error)
-    });
+  openEditModal(outage: Outage): void {
+    this.isEdit = true;
+    this.selectedOutage = outage;
+    this.selectedStatus = outage.outageStatus;
+    this.outageForm = {
+      userId: outage.userId,
+      regionId: outage.regionId,
+      description: outage.description
+    };
+    this.showModal = true;
   }
 
-  deleteOutage(id: number): void {
-    if (confirm('Da li ste sigurni da želite da obrišete ovaj prekid?')) {
-      this.outageService.deleteOutage(id).subscribe({
+  closeModal(): void {
+    this.showModal = false;
+    this.selectedOutage = null;
+  }
+
+  saveOutage(): void {
+    if (this.isEdit && this.selectedOutage) {
+      // Update status if changed
+      if (this.selectedStatus !== this.selectedOutage.outageStatus) {
+        this.outageService.updateOutageStatus(this.selectedOutage.id, { newStatus: this.selectedStatus }).subscribe({
+          next: () => {
+            this.loadOutages();
+          },
+          error: (error) => console.error('Error updating status:', error)
+        });
+      }
+      this.closeModal();
+    } else {
+      // Create new outage
+      this.outageService.createOutage(this.outageForm).subscribe({
         next: () => {
-          this.outages = this.outages.filter(o => o.id !== id);
+          this.loadOutages();
+          this.closeModal();
         },
-        error: (error) => console.error('Error deleting outage:', error)
+        error: (error) => console.error('Error creating outage:', error)
       });
     }
   }
 
-  resetForm(): void {
-    this.newOutage = { userId: 0, regionId: 0, description: '' };
-    this.showCreateForm = false;
+  openDeleteModal(outage: Outage): void {
+    this.selectedOutage = outage;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.selectedOutage = null;
+  }
+
+  confirmDelete(): void {
+    if (this.selectedOutage) {
+      this.outageService.deleteOutage(this.selectedOutage.id).subscribe({
+        next: () => {
+          this.loadOutages();
+          this.closeDeleteModal();
+        },
+        error: (error) => console.error('Error deleting outage:', error)
+      });
+    }
   }
 }

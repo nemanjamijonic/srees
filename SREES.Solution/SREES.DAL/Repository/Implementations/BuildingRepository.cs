@@ -24,5 +24,12 @@ namespace SREES.DAL.Repository.Implementations
                 .Where(b => !b.IsDeleted)
                 .ToListAsync();
         }
+
+        public async Task<int> GetTotalBuildingCountAsync()
+        {
+            return await Context.Buildings
+                .Where(b => !b.IsDeleted)
+                .CountAsync();
+        }
     }
 }

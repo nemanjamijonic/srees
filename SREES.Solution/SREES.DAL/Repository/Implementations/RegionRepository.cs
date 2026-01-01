@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SREES.Common.Repositories.Implementations;
 using SREES.DAL.Context;
 using SREES.DAL.Models;
@@ -14,6 +15,13 @@ namespace SREES.DAL.Repository.Implementations
 
         public RegionRepository(SreesContext context) : base(context)
         {
+        }
+
+        public async Task<int> GetTotalRegionCountAsync()
+        {
+            return await Context.Regions
+                .Where(r => !r.IsDeleted)
+                .CountAsync();
         }
     }
 }

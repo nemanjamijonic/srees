@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Customers;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
@@ -20,6 +21,29 @@ namespace SREES.API.Controllers
         public async Task<ActionResult<ResponsePackage<List<CustomerDataOut>>>> GetAllCustomers()
         {
             var result = await _customerApplicationService.GetAllCustomers();
+            return Ok(result);
+        }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>>> GetCustomersFiltered(
+            [FromQuery] string? searchTerm,
+            [FromQuery] int? customerType,
+            [FromQuery] DateTime? dateFrom,
+            [FromQuery] DateTime? dateTo,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var filterRequest = new CustomerFilterRequest
+            {
+                SearchTerm = searchTerm,
+                CustomerType = customerType,
+                DateFrom = dateFrom,
+                DateTo = dateTo,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            var result = await _customerApplicationService.GetCustomersFiltered(filterRequest);
             return Ok(result);
         }
 
@@ -70,9 +94,16 @@ namespace SREES.API.Controllers
         public async Task<ActionResult<ResponsePackage<string>>> DeleteCustomer(int id)
         {
             var result = await _customerApplicationService.DeleteCustomer(id);
-            if (result.Data == null && result.Message.Contains("nije pronađen"))
+            if (result.Data == null && result.Message!.Contains("nije pronađen"))
                 return NotFound(result);
 
+            return Ok(result);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetCustomerStatistics()
+        {
+            var result = await _customerApplicationService.GetCustomerStatistics();
             return Ok(result);
         }
     }

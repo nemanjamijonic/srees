@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Region, CreateRegionRequest, UpdateRegionRequest, ApiResponse } from '../models/region.model';
 import { RegionSelectOption } from '../models/region-select.model';
+import { EntityCountStatistics } from '../models/statistics.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,5 +35,9 @@ export class RegionService {
 
   delete(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${id}`);
+  }
+
+  getStatistics(): Observable<ApiResponse<EntityCountStatistics[]>> {
+    return this.http.get<ApiResponse<EntityCountStatistics[]>>(`${this.apiUrl}/statistics`);
   }
 }

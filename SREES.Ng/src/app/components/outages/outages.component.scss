@@ -1,99 +1,373 @@
-.outages-container {
-  padding: 2rem;
+.modal.show {
+  display: block !important;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+.modal-backdrop.show {
+  opacity: 0.5;
 }
 
-.create-form {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
+// Modern Card Container
+.container-fluid {
+  background: var(--background-light);
+  min-height: 100vh;
+  padding: 2rem !important;
 }
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.outages-table {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-th, td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-th {
-  background: #f8f9fa;
-  font-weight: 600;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
+.card {
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(19, 41, 61, 0.1);
+  overflow: hidden;
+  background: white;
+
+  .card-header {
+    background: white;
+    border-bottom: 3px solid var(--primary-blue);
+    padding: 1.5rem;
+    
+    h4 {
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin: 0;
+      
+      &.mb-0 {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0, 100, 148, 0.3);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 100, 148, 0.4);
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
+      }
+
+      i {
+        margin-right: 0.5rem;
+        
+        &.me-2 {
+          margin-right: 0.5rem !important;
+        }
+      }
+    }
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+}
+
+// Modern Table Styles
+.table-responsive {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.table {
+  margin-bottom: 0;
+  
+  thead th {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    white-space: nowrap;
+  }
+
+  tbody {
+    background: white;
+    
+    tr {
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #e2e8f0;
+      
+      &:hover {
+        background: rgba(0, 100, 148, 0.03);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  td {
+    vertical-align: middle;
+    padding: 1rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+
+    strong {
+      color: var(--primary-blue);
+      font-weight: 600;
+    }
+  }
+}
+
+// Modern Action Buttons
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+
+  .btn-sm {
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border: 1px solid;
+    font-weight: 500;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    i {
+      font-size: 0.875rem;
+    }
+  }
+
+  .btn-outline-primary {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    background: white;
+
+    &:hover {
+      background: var(--primary-blue);
+      color: white;
+    }
+  }
+
+  .btn-outline-danger {
+    border-color: #f56565;
+    color: #f56565;
+    background: white;
+
+    &:hover {
+      background: #f56565;
+      color: white;
+    }
+  }
+}
+
+// Modern Badge Styling
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.375rem 0.75rem;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+  
+  &.bg-success {
+    background: #48bb78 !important;
+    color: white;
+  }
+
+  &.bg-danger {
+    background: #f56565 !important;
+    color: white;
+  }
+
+  &.bg-info {
+    background: #4299e1 !important;
+    color: white;
+  }
+
+  &.bg-warning {
+    background: #ed8936 !important;
+    color: white;
+  }
+
+  &.bg-primary {
+    background: var(--primary-blue) !important;
+    color: white;
+  }
+}
+
+// Modal improvements
+.modal-content {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background: var(--primary-blue);
+  border: none;
+  padding: 1.25rem 1.5rem;
+  
+  .modal-title {
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .btn-close {
+    filter: brightness(0) invert(1);
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+  
+  .form-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-control, .form-select {
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    padding: 0.625rem 1rem;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #1b98e0;
+      box-shadow: 0 0 0 3px rgba(27, 152, 224, 0.1);
+    }
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+.modal-footer {
+  border: none;
+  padding: 1rem 1.5rem;
+  background: #f7fafc;
 }
 
 .btn-primary {
-  background: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+  border: none;
+  border-radius: 6px;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 100, 148, 0.3);
+  }
 }
 
 .btn-danger {
-  background: #dc3545;
-  color: white;
+  border-radius: 6px;
+  background: #f56565;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #e53e3e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+  }
 }
 
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
+.btn-secondary {
+  border-radius: 6px;
+  background: #e2e8f0;
+  color: var(--text-primary);
+  border: none;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #cbd5e0;
+  }
 }
 
-.loading {
-  text-align: center;
-  padding: 2rem;
+// Responsive improvements
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem !important;
+  }
+
+  .card {
+    border-radius: 8px;
+
+    .card-header {
+      padding: 1rem;
+
+      h4 {
+        font-size: 1.25rem;
+      }
+
+      .btn-primary {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+  }
+
+  .action-buttons {
+    gap: 0.25rem;
+    
+    .btn-sm {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+
+  .table thead th {
+    font-size: 0.7rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+// Form styling improvements
+.form-control, .form-select {
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(27, 152, 224, 0.1);
+  }
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
 }

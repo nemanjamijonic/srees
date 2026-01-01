@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Common.Models.Dtos.Substations;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
@@ -142,12 +143,35 @@ namespace SREES.BLL.Services.Implementation
 
                 _uow.GetSubstationRepository().RemoveEntity(substation);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<string>(null, "Transformatorska stanica uspešno obrisana");
+                return new ResponsePackage<string>(null, "Transformatorska stanica uspe?no obrisana");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri brisanju transformatorske stanice sa ID-om {SubstationId}", id);
-                return new ResponsePackage<string>(null, "Greška pri brisanju transformatorske stanice");
+                _logger.LogError(ex, "Gre?ka pri brisanju transformatorske stanice sa ID-om {SubstationId}", id);
+                return new ResponsePackage<string>(null, "Gre?ka pri brisanju transformatorske stanice");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetSubstationStatistics()
+        {
+            try
+            {
+                var substationCountByType = await _uow.GetSubstationRepository().GetSubstationCountByTypeAsync();
+                var statistics = substationCountByType
+                    .Select(kvp => new EntityCountStatisticsDataOut
+                    {
+                        Name = kvp.Key.ToString(),
+                        Count = kvp.Value,
+                        Type = "SubstationType"
+                    })
+                    .ToList();
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika transformatorskih stanica uspešno preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju statistike transformatorskih stanica");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike transformatorskih stanica");
             }
         }
     }

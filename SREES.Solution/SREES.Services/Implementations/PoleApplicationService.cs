@@ -1,6 +1,7 @@
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Poles;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.Services.Implementations
@@ -42,6 +43,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeletePole(int id)
         {
             return await _poleService.DeletePole(id);
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetPoleStatistics()
+        {
+            return await _poleService.GetPoleStatistics();
         }
     }
 }

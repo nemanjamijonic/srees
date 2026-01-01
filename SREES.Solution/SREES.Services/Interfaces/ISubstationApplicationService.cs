@@ -1,4 +1,5 @@
 using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Common.Models.Dtos.Substations;
 
 namespace SREES.Services.Interfaces
@@ -11,5 +12,6 @@ namespace SREES.Services.Interfaces
         Task<ResponsePackage<SubstationDataOut?>> CreateSubstation(SubstationDataIn substationDataIn);
         Task<ResponsePackage<SubstationDataOut?>> UpdateSubstation(int id, SubstationDataIn substationDataIn);
         Task<ResponsePackage<string>> DeleteSubstation(int id);
+        Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetSubstationStatistics();
     }
 }

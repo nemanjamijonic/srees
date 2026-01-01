@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Common.Models.Dtos.Substations;
 using SREES.Services.Interfaces;
 
@@ -45,6 +46,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeleteSubstation(int id)
         {
             return await _substationService.DeleteSubstation(id);
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetSubstationStatistics()
+        {
+            return await _substationService.GetSubstationStatistics();
         }
     }
 }

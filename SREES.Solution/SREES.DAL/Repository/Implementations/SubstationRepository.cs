@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using SREES.Common.Constants;
 using SREES.Common.Repositories.Implementations;
 using SREES.DAL.Context;
 using SREES.DAL.Models;
@@ -14,6 +16,15 @@ namespace SREES.DAL.Repository.Implementations
 
         public SubstationRepository(SreesContext context) : base(context)
         {
+        }
+
+        public async Task<Dictionary<SubstationType, int>> GetSubstationCountByTypeAsync()
+        {
+            return await Context.Substations
+                .Where(s => !s.IsDeleted)
+                .GroupBy(s => s.SubstationType)
+                .Select(g => new { Type = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Type, x => x.Count);
         }
     }
 }

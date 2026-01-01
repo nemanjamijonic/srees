@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Outage, CreateOutageRequest, UpdateOutageStatusRequest, ApiResponse } from '../models/outage.model';
+import { EntityCountStatistics } from '../models/statistics.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,9 @@ export class OutageService {
 
   deleteOutage(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/${id}`);
+  }
+
+  getStatistics(): Observable<ApiResponse<EntityCountStatistics[]>> {
+    return this.http.get<ApiResponse<EntityCountStatistics[]>>(`${this.baseUrl}/statistics`);
   }
 }

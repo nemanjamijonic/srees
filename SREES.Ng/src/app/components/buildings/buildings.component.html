@@ -100,7 +100,7 @@
             <label class="form-label">Pole:</label>
             <select class="form-select" [(ngModel)]="buildingForm.poleId" name="poleId" required>
               <option [ngValue]="0">Select pole</option>
-              <option *ngFor="let pole of poleOptions" [ngValue]="pole.id">{{ pole.address }}</option>
+              <option *ngFor="let pole of poleOptions" [ngValue]="pole.id">{{ pole.name }}</option>
             </select>
           </div>
         </div>

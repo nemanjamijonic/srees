@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using SREES.Common.Constants;
 using SREES.Common.Repositories.Implementations;
 using SREES.DAL.Context;
 using SREES.DAL.Models;
@@ -14,6 +16,15 @@ namespace SREES.DAL.Repository.Implementations
 
         public OutageRepository(SreesContext context) : base(context)
         {
+        }
+
+        public async Task<Dictionary<OutageStatus, int>> GetOutageCountByStatusAsync()
+        {
+            return await Context.Outages
+                .Where(o => !o.IsDeleted)
+                .GroupBy(o => o.OutageStatus)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Status, x => x.Count);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Poles;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -27,12 +28,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var poles = await _uow.GetPoleRepository().GetAllAsync();
                 var poleList = _mapper.Map<List<PoleDataOut>>(poles.ToList());
-                return new ResponsePackage<List<PoleDataOut>>(poleList, "Stubovi uspešno preuzeti");
+                return new ResponsePackage<List<PoleDataOut>>(poleList, "Stubovi uspeï¿½no preuzeti");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju svih stubova");
-                return new ResponsePackage<List<PoleDataOut>>(null, "Greška pri preuzimanju stubova");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju svih stubova");
+                return new ResponsePackage<List<PoleDataOut>>(null, "Greï¿½ka pri preuzimanju stubova");
             }
         }
 
@@ -42,12 +43,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var poles = await _uow.GetPoleRepository().GetAllAsync();
                 var poleSelectList = _mapper.Map<List<PoleSelectDataOut>>(poles.ToList());
-                return new ResponsePackage<List<PoleSelectDataOut>>(poleSelectList, "Stubovi za select uspešno preuzeti");
+                return new ResponsePackage<List<PoleSelectDataOut>>(poleSelectList, "Stubovi za select uspeï¿½no preuzeti");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju stubova za select");
-                return new ResponsePackage<List<PoleSelectDataOut>>(null, "Greška pri preuzimanju stubova za select");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju stubova za select");
+                return new ResponsePackage<List<PoleSelectDataOut>>(null, "Greï¿½ka pri preuzimanju stubova za select");
             }
         }
 
@@ -60,12 +61,12 @@ namespace SREES.BLL.Services.Implementation
                     return new ResponsePackage<PoleDataOut?>(null, "Stub nije prona?en");
 
                 var poleDataOut = _mapper.Map<PoleDataOut>(pole);
-                return new ResponsePackage<PoleDataOut?>(poleDataOut, "Stub uspešno preuzet");
+                return new ResponsePackage<PoleDataOut?>(poleDataOut, "Stub uspeï¿½no preuzet");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju stuba sa ID-om {PoleId}", id);
-                return new ResponsePackage<PoleDataOut?>(null, "Greška pri preuzimanju stuba");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju stuba sa ID-om {PoleId}", id);
+                return new ResponsePackage<PoleDataOut?>(null, "Greï¿½ka pri preuzimanju stuba");
             }
         }
 
@@ -83,6 +84,7 @@ namespace SREES.BLL.Services.Implementation
 
                 var pole = new Pole
                 {
+                    Name = poleDataIn.Name,
                     Latitude = poleDataIn.Latitude,
                     Longitude = poleDataIn.Longitude,
                     Address = poleDataIn.Address,
@@ -94,12 +96,12 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var poleDataOut = _mapper.Map<PoleDataOut>(pole);
-                return new ResponsePackage<PoleDataOut?>(poleDataOut, "Stub uspešno kreiran");
+                return new ResponsePackage<PoleDataOut?>(poleDataOut, "Stub uspeï¿½no kreiran");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri kreiranju stuba");
-                return new ResponsePackage<PoleDataOut?>(null, "Greška pri kreiranju stuba");
+                _logger.LogError(ex, "Greï¿½ka pri kreiranju stuba");
+                return new ResponsePackage<PoleDataOut?>(null, "Greï¿½ka pri kreiranju stuba");
             }
         }
 
@@ -119,6 +121,7 @@ namespace SREES.BLL.Services.Implementation
                         return new ResponsePackage<PoleDataOut?>(null, "Regija nije prona?ena");
                 }
 
+                pole.Name = poleDataIn.Name;
                 pole.Latitude = poleDataIn.Latitude;
                 pole.Longitude = poleDataIn.Longitude;
                 pole.Address = poleDataIn.Address;
@@ -129,12 +132,12 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var poleDataOut = _mapper.Map<PoleDataOut>(pole);
-                return new ResponsePackage<PoleDataOut?>(poleDataOut, "Stub uspešno ažuriran");
+                return new ResponsePackage<PoleDataOut?>(poleDataOut, "Stub uspeï¿½no aï¿½uriran");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri ažuriranju stuba sa ID-om {PoleId}", id);
-                return new ResponsePackage<PoleDataOut?>(null, "Greška pri ažuriranju stuba");
+                _logger.LogError(ex, "Greï¿½ka pri aï¿½uriranju stuba sa ID-om {PoleId}", id);
+                return new ResponsePackage<PoleDataOut?>(null, "Greï¿½ka pri aï¿½uriranju stuba");
             }
         }
 
@@ -148,12 +151,35 @@ namespace SREES.BLL.Services.Implementation
 
                 _uow.GetPoleRepository().RemoveEntity(pole);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<string>(null, "Stub uspešno obrisan");
+                return new ResponsePackage<string>(null, "Stub uspeï¿½no obrisan");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri brisanju stuba sa ID-om {PoleId}", id);
-                return new ResponsePackage<string>(null, "Greška pri brisanju stuba");
+                _logger.LogError(ex, "Greï¿½ka pri brisanju stuba sa ID-om {PoleId}", id);
+                return new ResponsePackage<string>(null, "Greï¿½ka pri brisanju stuba");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetPoleStatistics()
+        {
+            try
+            {
+                var poleCountByType = await _uow.GetPoleRepository().GetPoleCountByTypeAsync();
+                var statistics = poleCountByType
+                    .Select(kvp => new EntityCountStatisticsDataOut
+                    {
+                        Name = kvp.Key.ToString(),
+                        Count = kvp.Value,
+                        Type = "PoleType"
+                    })
+                    .ToList();
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika stubova uspeÅ¡no preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GreÅ¡ka pri preuzimanju statistike stubova");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "GreÅ¡ka pri preuzimanju statistike stubova");
             }
         }
     }

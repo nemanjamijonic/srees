@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Common.Models.Dtos.Substations;
 using SREES.Services.Interfaces;
 
@@ -73,6 +74,13 @@ namespace SREES.API.Controllers
             if (result.Data == null && result.Message!.Contains("nije pronađena"))
                 return NotFound(result);
 
+            return Ok(result);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetSubstationStatistics()
+        {
+            var result = await _substationApplicationService.GetSubstationStatistics();
             return Ok(result);
         }
     }

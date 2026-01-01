@@ -1,0 +1,244 @@
+.dashboard-container {
+  padding: 2rem;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.6s ease-out;
+
+  .dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    i {
+      color: #3498db;
+    }
+  }
+
+  .dashboard-subtitle {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin: 0;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  animation: fadeIn 0.5s ease-out;
+
+  p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+  }
+}
+
+// KPI Cards Grid
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+  &:nth-child(4) { animation-delay: 0.4s; }
+  &:nth-child(5) { animation-delay: 0.5s; }
+  &:nth-child(6) { animation-delay: 0.6s; }
+  &:nth-child(7) { animation-delay: 0.7s; }
+  &:nth-child(8) { animation-delay: 0.8s; }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .kpi-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+
+    &.bg-danger { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    &.bg-primary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    &.bg-success { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    &.bg-info { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    &.bg-warning { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+    &.bg-secondary { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+    &.bg-dark { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+  }
+
+  .kpi-info {
+    flex: 1;
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .kpi-label {
+      font-size: 0.95rem;
+      color: #7f8c8d;
+      margin: 0.5rem 0 0 0;
+      font-weight: 500;
+    }
+  }
+}
+
+// Charts Grid
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.8s ease-out;
+  animation-fill-mode: both;
+
+  &:nth-child(1) { animation-delay: 0.7s; }
+  &:nth-child(2) { animation-delay: 0.8s; }
+  &:nth-child(3) { animation-delay: 0.9s; }
+  &:nth-child(4) { animation-delay: 1s; }
+  &:nth-child(5) { animation-delay: 1.1s; }
+  &:nth-child(6) { animation-delay: 1.2s; }
+
+  &:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  &.chart-card-wide {
+    grid-column: span 2;
+
+    @media (max-width: 1200px) {
+      grid-column: span 1;
+    }
+  }
+
+  .chart-container {
+    position: relative;
+    height: 350px;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    .dashboard-title {
+      font-size: 1.8rem;
+    }
+
+    .dashboard-subtitle {
+      font-size: 0.95rem;
+    }
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-card {
+    .chart-container {
+      height: 300px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-card {
+    flex-direction: column;
+    text-align: center;
+
+    .kpi-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+    }
+
+    .kpi-info {
+      .kpi-value {
+        font-size: 1.5rem;
+      }
+
+      .kpi-label {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}

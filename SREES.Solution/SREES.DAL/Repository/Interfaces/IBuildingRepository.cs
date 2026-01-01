@@ -6,5 +6,6 @@ namespace SREES.DAL.Repository.Interfaces
     public interface IBuildingRepository : IRepository<Building>
     {
         Task<IEnumerable<Building>> GetAllWithPoleAsync();
+        Task<int> GetTotalBuildingCountAsync();
     }
 }

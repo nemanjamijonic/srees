@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Customer, CreateCustomerRequest, UpdateCustomerRequest, CustomerSelectOption, ApiResponse } from '../models/customer.model';
+import { Customer, CreateCustomerRequest, UpdateCustomerRequest, CustomerSelectOption, ApiResponse, CustomerFilterRequest, PaginatedResponse } from '../models/customer.model';
+import { EntityCountStatistics } from '../models/statistics.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,27 @@ export class CustomerService {
 
   getAll(): Observable<ApiResponse<Customer[]>> {
     return this.http.get<ApiResponse<Customer[]>>(this.apiUrl);
+  }
+
+  getFiltered(filterRequest: CustomerFilterRequest): Observable<ApiResponse<PaginatedResponse<Customer[]>>> {
+    let params = new HttpParams()
+      .set('pageNumber', filterRequest.pageNumber.toString())
+      .set('pageSize', filterRequest.pageSize.toString());
+
+    if (filterRequest.searchTerm) {
+      params = params.set('searchTerm', filterRequest.searchTerm);
+    }
+    if (filterRequest.customerType !== undefined && filterRequest.customerType !== null) {
+      params = params.set('customerType', filterRequest.customerType.toString());
+    }
+    if (filterRequest.dateFrom) {
+      params = params.set('dateFrom', filterRequest.dateFrom);
+    }
+    if (filterRequest.dateTo) {
+      params = params.set('dateTo', filterRequest.dateTo);
+    }
+
+    return this.http.get<ApiResponse<PaginatedResponse<Customer[]>>>(`${this.apiUrl}/filtered`, { params });
   }
 
   getAllForSelect(): Observable<ApiResponse<CustomerSelectOption[]>> {
@@ -33,5 +55,9 @@ export class CustomerService {
 
   delete(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${id}`);
+  }
+
+  getStatistics(): Observable<ApiResponse<EntityCountStatistics[]>> {
+    return this.http.get<ApiResponse<EntityCountStatistics[]>>(`${this.apiUrl}/statistics`);
   }
 }

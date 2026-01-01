@@ -1,5 +1,6 @@
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Regions;
+using SREES.Common.Models.Dtos.Statistics;
 
 namespace SREES.BLL.Services.Interfaces
 {
@@ -11,5 +12,6 @@ namespace SREES.BLL.Services.Interfaces
         Task<ResponsePackage<RegionDataOut?>> CreateRegion(RegionDataIn regionDataIn);
         Task<ResponsePackage<RegionDataOut?>> UpdateRegion(int id, RegionDataIn regionDataIn);
         Task<ResponsePackage<string>> DeleteRegion(int id);
+        Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetRegionStatistics();
     }
 }

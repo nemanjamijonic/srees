@@ -11,7 +11,7 @@ namespace SREES.BLL.Mappings
             CreateMap<Pole, PoleDataOut>().ReverseMap();
             CreateMap<PoleDataIn, Pole>();
             CreateMap<Pole, PoleSelectDataOut>()
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address ?? $"Pole {src.Id}"));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Regions;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
@@ -73,6 +74,13 @@ namespace SREES.API.Controllers
             if (result.Data == null && result.Message!.Contains("nije pronađena"))
                 return NotFound(result);
 
+            return Ok(result);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetRegionStatistics()
+        {
+            var result = await _regionApplicationService.GetRegionStatistics();
             return Ok(result);
         }
     }

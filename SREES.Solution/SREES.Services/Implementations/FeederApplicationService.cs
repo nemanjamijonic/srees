@@ -1,6 +1,7 @@
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Feeders;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.Services.Implementations
@@ -42,6 +43,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeleteFeeder(int id)
         {
             return await _feederService.DeleteFeeder(id);
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetFeederStatistics()
+        {
+            return await _feederService.GetFeederStatistics();
         }
     }
 }

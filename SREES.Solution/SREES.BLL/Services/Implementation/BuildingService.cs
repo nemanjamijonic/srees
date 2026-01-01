@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Buildings;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -172,6 +173,30 @@ namespace SREES.BLL.Services.Implementation
             {
                 _logger.LogError(ex, "Greška pri brisanju zgrade sa ID-om {BuildingId}", id);
                 return new ResponsePackage<string>(null, "Greška pri brisanju zgrade");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetBuildingStatistics()
+        {
+            try
+            {
+                var totalCount = await _uow.GetBuildingRepository().GetTotalBuildingCountAsync();
+                var statistics = new List<EntityCountStatisticsDataOut>
+                {
+                    new EntityCountStatisticsDataOut
+                    {
+                        Name = "Total Buildings",
+                        Count = totalCount,
+                        Type = "Total"
+                    }
+                };
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika zgrada uspešno preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju statistike zgrada");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike zgrada");
             }
         }
     }

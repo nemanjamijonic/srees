@@ -1,6 +1,7 @@
 ﻿using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Outages;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.Services.Implementations
@@ -37,6 +38,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeleteOutage(int id)
         {
             return await _outageService.DeleteOutage(id);
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetOutageStatistics()
+        {
+            return await _outageService.GetOutageStatistics();
         }
     }
 }

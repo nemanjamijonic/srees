@@ -5,5 +5,6 @@ namespace SREES.DAL.Repository.Interfaces
 {
     public interface IRegionRepository : IRepository<Region>
     {
+        Task<int> GetTotalRegionCountAsync();
     }
 }

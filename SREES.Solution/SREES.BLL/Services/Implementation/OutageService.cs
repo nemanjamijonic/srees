@@ -4,6 +4,7 @@ using SREES.BLL.Services.Interfaces;
 using SREES.Common.Constants;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Outages;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.DAL.UOW.Interafaces;
 using OutageModel = SREES.DAL.Models.Outage;
 
@@ -133,6 +134,29 @@ namespace SREES.BLL.Services.Implementation
             {
                 _logger.LogError(ex, "Greška pri brisanju prekida napajanja sa ID-om {OutageId}", id);
                 return new ResponsePackage<string>(null, "Greška pri brisanju prekida napajanja");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetOutageStatistics()
+        {
+            try
+            {
+                var outageCountByStatus = await _uow.GetOutageRepository().GetOutageCountByStatusAsync();
+                var statistics = outageCountByStatus
+                    .Select(kvp => new EntityCountStatisticsDataOut
+                    {
+                        Name = kvp.Key.ToString(),
+                        Count = kvp.Value,
+                        Type = "OutageStatus"
+                    })
+                    .ToList();
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika prekida napajanja uspešno preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju statistike prekida napajanja");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike prekida napajanja");
             }
         }
     }

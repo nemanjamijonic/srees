@@ -1,8 +1,10 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
+using SREES.Common.Constants;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Customers;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -27,12 +29,36 @@ namespace SREES.BLL.Services.Implementation
             {
                 var customers = await _uow.GetCustomerRepository().GetAllAsync();
                 var customerList = _mapper.Map<List<CustomerDataOut>>(customers.ToList());
-                return new ResponsePackage<List<CustomerDataOut>>(customerList, "Kupci uspešno preuzeti");
+                return new ResponsePackage<List<CustomerDataOut>>(customerList, "Kupci uspeï¿½no preuzeti");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju svih kupaca");
-                return new ResponsePackage<List<CustomerDataOut>>(null, "Greška pri preuzimanju kupaca");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju svih kupaca");
+                return new ResponsePackage<List<CustomerDataOut>>(null, "Greï¿½ka pri preuzimanju kupaca");
+            }
+        }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>> GetCustomersFiltered(CustomerFilterRequest filterRequest)
+        {
+            try
+            {
+                var (customers, totalCount) = await _uow.GetCustomerRepository().GetCustomersFilteredAsync(filterRequest);
+                
+                var customerList = _mapper.Map<List<CustomerDataOut>>(customers.ToList());
+                var paginatedResponse = new PaginatedResponse<List<CustomerDataOut>>(
+                    customerList, 
+                    totalCount, 
+                    filterRequest.PageNumber, 
+                    filterRequest.PageSize);
+
+                return new ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>(
+                    paginatedResponse, 
+                    "Customers successfully retrieved");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving filtered customers");
+                return new ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>(null, "Error retrieving customers");
             }
         }
 
@@ -42,12 +68,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var customers = await _uow.GetCustomerRepository().GetAllAsync();
                 var customerSelectList = _mapper.Map<List<CustomerSelectDataOut>>(customers.ToList());
-                return new ResponsePackage<List<CustomerSelectDataOut>>(customerSelectList, "Kupci za select uspešno preuzeti");
+                return new ResponsePackage<List<CustomerSelectDataOut>>(customerSelectList, "Kupci za select uspeï¿½no preuzeti");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju kupaca za select");
-                return new ResponsePackage<List<CustomerSelectDataOut>>(null, "Greška pri preuzimanju kupaca za select");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju kupaca za select");
+                return new ResponsePackage<List<CustomerSelectDataOut>>(null, "Greï¿½ka pri preuzimanju kupaca za select");
             }
         }
 
@@ -60,12 +86,12 @@ namespace SREES.BLL.Services.Implementation
                     return new ResponsePackage<CustomerDataOut?>(null, "Kupac nije prona?en");
 
                 var customerDataOut = _mapper.Map<CustomerDataOut>(customer);
-                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspešno preuzet");
+                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspeï¿½no preuzet");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju kupca sa ID-om {CustomerId}", id);
-                return new ResponsePackage<CustomerDataOut?>(null, "Greška pri preuzimanju kupca");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju kupca sa ID-om {CustomerId}", id);
+                return new ResponsePackage<CustomerDataOut?>(null, "Greï¿½ka pri preuzimanju kupca");
             }
         }
 
@@ -95,12 +121,12 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var customerDataOut = _mapper.Map<CustomerDataOut>(customer);
-                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspešno kreiran");
+                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspeï¿½no kreiran");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri kreiranju kupca");
-                return new ResponsePackage<CustomerDataOut?>(null, "Greška pri kreiranju kupca");
+                _logger.LogError(ex, "Greï¿½ka pri kreiranju kupca");
+                return new ResponsePackage<CustomerDataOut?>(null, "Greï¿½ka pri kreiranju kupca");
             }
         }
 
@@ -131,12 +157,12 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var customerDataOut = _mapper.Map<CustomerDataOut>(customer);
-                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspešno ažuriran");
+                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspeï¿½no aï¿½uriran");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri ažuriranju kupca sa ID-om {CustomerId}", id);
-                return new ResponsePackage<CustomerDataOut?>(null, "Greška pri ažuriranju kupca");
+                _logger.LogError(ex, "Greï¿½ka pri aï¿½uriranju kupca sa ID-om {CustomerId}", id);
+                return new ResponsePackage<CustomerDataOut?>(null, "Greï¿½ka pri aï¿½uriranju kupca");
             }
         }
 
@@ -150,12 +176,35 @@ namespace SREES.BLL.Services.Implementation
 
                 _uow.GetCustomerRepository().RemoveEntity(customer);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<string>(null, "Kupac uspešno obrisan");
+                return new ResponsePackage<string>(null, "Kupac uspeï¿½no obrisan");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri brisanju kupca sa ID-om {CustomerId}", id);
-                return new ResponsePackage<string>(null, "Greška pri brisanju kupca");
+                _logger.LogError(ex, "Greï¿½ka pri brisanju kupca sa ID-om {CustomerId}", id);
+                return new ResponsePackage<string>(null, "Greï¿½ka pri brisanju kupca");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetCustomerStatistics()
+        {
+            try
+            {
+                var customerCountByType = await _uow.GetCustomerRepository().GetCustomerCountByTypeAsync();
+                var statistics = customerCountByType
+                    .Select(kvp => new EntityCountStatisticsDataOut
+                    {
+                        Name = kvp.Key.ToString(),
+                        Count = kvp.Value,
+                        Type = "CustomerType"
+                    })
+                    .ToList();
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika kupaca uspeï¿½no preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju statistike kupaca");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greï¿½ka pri preuzimanju statistike kupaca");
             }
         }
     }

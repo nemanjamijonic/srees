@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Feeders;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -152,6 +153,29 @@ namespace SREES.BLL.Services.Implementation
             {
                 _logger.LogError(ex, "Greška pri brisanju fidera sa ID-om {FeederId}", id);
                 return new ResponsePackage<string>(null, "Greška pri brisanju fidera");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetFeederStatistics()
+        {
+            try
+            {
+                var feederCountByType = await _uow.GetFeederRepository().GetFeederCountByTypeAsync();
+                var statistics = feederCountByType
+                    .Select(kvp => new EntityCountStatisticsDataOut
+                    {
+                        Name = kvp.Key.ToString(),
+                        Count = kvp.Value,
+                        Type = "FeederType"
+                    })
+                    .ToList();
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika fidera uspešno preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju statistike fidera");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike fidera");
             }
         }
     }

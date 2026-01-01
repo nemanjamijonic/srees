@@ -22,6 +22,7 @@ export class PolesComponent implements OnInit {
   selectedPole: Pole | null = null;
   
   poleForm: CreatePoleRequest = {
+    name: '',
     latitude: 0,
     longitude: 0,
     address: '',
@@ -54,6 +55,7 @@ export class PolesComponent implements OnInit {
   openCreateModal() {
     this.isEdit = false;
     this.poleForm = {
+      name: '',
       latitude: 0,
       longitude: 0,
       address: '',
@@ -67,6 +69,7 @@ export class PolesComponent implements OnInit {
     this.isEdit = true;
     this.selectedPole = pole;
     this.poleForm = {
+      name: pole.name,
       latitude: pole.latitude,
       longitude: pole.longitude,
       address: pole.address,

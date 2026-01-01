@@ -1,5 +1,6 @@
 export interface Pole {
   id: number;
+  name: string;
   latitude: number;
   longitude: number;
   address: string;
@@ -11,6 +12,7 @@ export interface Pole {
 }
 
 export interface CreatePoleRequest {
+  name: string;
   latitude: number;
   longitude: number;
   address: string;
@@ -19,6 +21,7 @@ export interface CreatePoleRequest {
 }
 
 export interface UpdatePoleRequest {
+  name: string;
   latitude: number;
   longitude: number;
   address: string;
@@ -28,7 +31,7 @@ export interface UpdatePoleRequest {
 
 export interface PoleSelectOption {
   id: number;
-  address: string;
+  name: string;
 }
 
 export interface ApiResponse<T> {

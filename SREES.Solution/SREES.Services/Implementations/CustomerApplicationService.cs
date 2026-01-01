@@ -1,6 +1,7 @@
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Customers;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.Services.Implementations
@@ -17,6 +18,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<List<CustomerDataOut>>> GetAllCustomers()
         {
             return await _customerService.GetAllCustomers();
+        }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>> GetCustomersFiltered(CustomerFilterRequest filterRequest)
+        {
+            return await _customerService.GetCustomersFiltered(filterRequest);
         }
 
         public async Task<ResponsePackage<List<CustomerSelectDataOut>>> GetAllCustomersForSelect()
@@ -42,6 +48,11 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeleteCustomer(int id)
         {
             return await _customerService.DeleteCustomer(id);
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetCustomerStatistics()
+        {
+            return await _customerService.GetCustomerStatistics();
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Regions;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -134,6 +135,30 @@ namespace SREES.BLL.Services.Implementation
             {
                 _logger.LogError(ex, "Greška pri brisanju regije sa ID-om {RegionId}", id);
                 return new ResponsePackage<string>(null, "Greška pri brisanju regije");
+            }
+        }
+
+        public async Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetRegionStatistics()
+        {
+            try
+            {
+                var totalCount = await _uow.GetRegionRepository().GetTotalRegionCountAsync();
+                var statistics = new List<EntityCountStatisticsDataOut>
+                {
+                    new EntityCountStatisticsDataOut
+                    {
+                        Name = "Total Regions",
+                        Count = totalCount,
+                        Type = "Total"
+                    }
+                };
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika regiona uspešno preuzeta");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri preuzimanju statistike regiona");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike regiona");
             }
         }
     }

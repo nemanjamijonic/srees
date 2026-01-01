@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Buildings;
+using SREES.Common.Models.Dtos.Statistics;
 using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
@@ -73,6 +74,13 @@ namespace SREES.API.Controllers
             if (result.Data == null && result.Message.Contains("nije prona?ena"))
                 return NotFound(result);
 
+            return Ok(result);
+        }
+
+        [HttpGet("statistics")]
+        public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetBuildingStatistics()
+        {
+            var result = await _buildingApplicationService.GetBuildingStatistics();
             return Ok(result);
         }
     }

@@ -157,6 +157,6 @@ export class BuildingsComponent implements OnInit {
 
   getPoleAddress(poleId: number): string {
     const pole = this.poleOptions.find(p => p.id === poleId);
-    return pole ? pole.address : 'N/A';
+    return pole ? pole.name : 'N/A';
   }
 }
