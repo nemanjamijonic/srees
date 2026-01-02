@@ -5,6 +5,7 @@ using SREES.Common.Constants;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Customers;
 using SREES.Common.Models.Dtos.Statistics;
+using SREES.Common.Services.Interfaces;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -15,26 +16,54 @@ namespace SREES.BLL.Services.Implementation
         private readonly ILogger<CustomerService> _logger;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly ICachingService _cachingService;
 
-        public CustomerService(ILogger<CustomerService> logger, IUnitOfWork uow, IMapper mapper)
+        // Cache keys constants
+        private const string EntityPrefix = "Customers";
+        private const string AllCustomersCacheKey = $"{EntityPrefix}|All";
+        private const string CustomerSelectCacheKey = $"{EntityPrefix}|Select";
+        private const string CustomerStatisticsCacheKey = $"{EntityPrefix}|Statistics";
+        private const string CustomerFilteredPrefix = $"{EntityPrefix}|Filtered";
+        private const string CustomerByIdPrefix = $"{EntityPrefix}|ById";
+        private const int CacheExpirationMinutes = 30;
+
+        public CustomerService(ILogger<CustomerService> logger, IUnitOfWork uow, IMapper mapper, ICachingService cachingService)
         {
             _logger = logger;
             _uow = uow;
             _mapper = mapper;
+            _cachingService = cachingService;
         }
 
         public async Task<ResponsePackage<List<CustomerDataOut>>> GetAllCustomers()
         {
             try
             {
+                // Check cache first
+                if (await _cachingService.ObjectsCached<List<CustomerDataOut>>(AllCustomersCacheKey))
+                {
+                    var cachedCustomers = await _cachingService.GetObjectsFromCache<List<CustomerDataOut>>(AllCustomersCacheKey);
+                    if (cachedCustomers != null)
+                    {
+                        _logger.LogInformation("Customers retrieved from cache");
+                        return new ResponsePackage<List<CustomerDataOut>>(cachedCustomers, "Kupci uspešno preuzeti iz keša");
+                    }
+                }
+
+                // If not in cache, get from database
                 var customers = await _uow.GetCustomerRepository().GetAllAsync();
                 var customerList = _mapper.Map<List<CustomerDataOut>>(customers.ToList());
-                return new ResponsePackage<List<CustomerDataOut>>(customerList, "Kupci uspe�no preuzeti");
+
+                // Store in cache
+                await _cachingService.SetObjectsInCache(AllCustomersCacheKey, customerList, CacheExpirationMinutes);
+                _logger.LogInformation("Customers stored in cache");
+
+                return new ResponsePackage<List<CustomerDataOut>>(customerList, "Kupci uspešno preuzeti");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri preuzimanju svih kupaca");
-                return new ResponsePackage<List<CustomerDataOut>>(null, "Gre�ka pri preuzimanju kupaca");
+                _logger.LogError(ex, "Greška pri preuzimanju svih kupaca");
+                return new ResponsePackage<List<CustomerDataOut>>(null, "Greška pri preuzimanju kupaca");
             }
         }
 
@@ -42,6 +71,23 @@ namespace SREES.BLL.Services.Implementation
         {
             try
             {
+                // Generate cache key based on filter parameters
+                var cacheKey = GenerateFilteredCacheKey(filterRequest);
+
+                // Check cache first
+                if (await _cachingService.ObjectsCached<PaginatedResponse<List<CustomerDataOut>>>(cacheKey))
+                {
+                    var cachedResult = await _cachingService.GetObjectsFromCache<PaginatedResponse<List<CustomerDataOut>>>(cacheKey);
+                    if (cachedResult != null)
+                    {
+                        _logger.LogInformation("Filtered customers retrieved from cache with key: {CacheKey}", cacheKey);
+                        return new ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>(
+                            cachedResult,
+                            "Customers successfully retrieved from cache");
+                    }
+                }
+
+                // If not in cache, get from database
                 var (customers, totalCount) = await _uow.GetCustomerRepository().GetCustomersFilteredAsync(filterRequest);
                 
                 var customerList = _mapper.Map<List<CustomerDataOut>>(customers.ToList());
@@ -50,6 +96,10 @@ namespace SREES.BLL.Services.Implementation
                     totalCount, 
                     filterRequest.PageNumber, 
                     filterRequest.PageSize);
+
+                // Store in cache
+                await _cachingService.SetObjectsInCache(cacheKey, paginatedResponse, CacheExpirationMinutes);
+                _logger.LogInformation("Filtered customers stored in cache with key: {CacheKey}", cacheKey);
 
                 return new ResponsePackage<PaginatedResponse<List<CustomerDataOut>>>(
                     paginatedResponse, 
@@ -66,14 +116,31 @@ namespace SREES.BLL.Services.Implementation
         {
             try
             {
+                // Check cache first
+                if (await _cachingService.ObjectsCached<List<CustomerSelectDataOut>>(CustomerSelectCacheKey))
+                {
+                    var cachedCustomers = await _cachingService.GetObjectsFromCache<List<CustomerSelectDataOut>>(CustomerSelectCacheKey);
+                    if (cachedCustomers != null)
+                    {
+                        _logger.LogInformation("Customers for select retrieved from cache");
+                        return new ResponsePackage<List<CustomerSelectDataOut>>(cachedCustomers, "Kupci za select uspešno preuzeti iz keša");
+                    }
+                }
+
+                // If not in cache, get from database
                 var customers = await _uow.GetCustomerRepository().GetAllAsync();
                 var customerSelectList = _mapper.Map<List<CustomerSelectDataOut>>(customers.ToList());
-                return new ResponsePackage<List<CustomerSelectDataOut>>(customerSelectList, "Kupci za select uspe�no preuzeti");
+
+                // Store in cache
+                await _cachingService.SetObjectsInCache(CustomerSelectCacheKey, customerSelectList, CacheExpirationMinutes);
+                _logger.LogInformation("Customers for select stored in cache");
+
+                return new ResponsePackage<List<CustomerSelectDataOut>>(customerSelectList, "Kupci za select uspešno preuzeti");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri preuzimanju kupaca za select");
-                return new ResponsePackage<List<CustomerSelectDataOut>>(null, "Gre�ka pri preuzimanju kupaca za select");
+                _logger.LogError(ex, "Greška pri preuzimanju kupaca za select");
+                return new ResponsePackage<List<CustomerSelectDataOut>>(null, "Greška pri preuzimanju kupaca za select");
             }
         }
 
@@ -81,17 +148,36 @@ namespace SREES.BLL.Services.Implementation
         {
             try
             {
+                var cacheKey = $"{CustomerByIdPrefix}:{id}";
+
+                // Check cache first
+                if (await _cachingService.ObjectsCached<CustomerDataOut>(cacheKey))
+                {
+                    var cachedCustomer = await _cachingService.GetObjectsFromCache<CustomerDataOut>(cacheKey);
+                    if (cachedCustomer != null)
+                    {
+                        _logger.LogInformation("Customer {CustomerId} retrieved from cache", id);
+                        return new ResponsePackage<CustomerDataOut?>(cachedCustomer, "Kupac uspešno preuzet iz keša");
+                    }
+                }
+
+                // If not in cache, get from database
                 var customer = await _uow.GetCustomerRepository().GetByIdAsync(id);
                 if (customer == null)
-                    return new ResponsePackage<CustomerDataOut?>(null, "Kupac nije prona?en");
+                    return new ResponsePackage<CustomerDataOut?>(null, "Kupac nije pronađen");
 
                 var customerDataOut = _mapper.Map<CustomerDataOut>(customer);
-                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspe�no preuzet");
+
+                // Store in cache
+                await _cachingService.SetObjectsInCache(cacheKey, customerDataOut, CacheExpirationMinutes);
+                _logger.LogInformation("Customer {CustomerId} stored in cache", id);
+
+                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspešno preuzet");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri preuzimanju kupca sa ID-om {CustomerId}", id);
-                return new ResponsePackage<CustomerDataOut?>(null, "Gre�ka pri preuzimanju kupca");
+                _logger.LogError(ex, "Greška pri preuzimanju kupca sa ID-om {CustomerId}", id);
+                return new ResponsePackage<CustomerDataOut?>(null, "Greška pri preuzimanju kupca");
             }
         }
 
@@ -104,7 +190,7 @@ namespace SREES.BLL.Services.Implementation
                 {
                     var building = await _uow.GetBuildingRepository().GetByIdAsync(customerDataIn.BuildingId.Value);
                     if (building == null)
-                        return new ResponsePackage<CustomerDataOut?>(null, "Zgrada nije prona?ena");
+                        return new ResponsePackage<CustomerDataOut?>(null, "Zgrada nije pronađena");
                 }
 
                 var customer = new Customer
@@ -120,13 +206,17 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.GetCustomerRepository().AddAsync(customer);
                 await _uow.CompleteAsync();
 
+                // Invalidate all relevant caches after creating a customer
+                await InvalidateCustomerCaches();
+                _logger.LogInformation("Customer caches invalidated after creating customer {CustomerId}", customer.Id);
+
                 var customerDataOut = _mapper.Map<CustomerDataOut>(customer);
-                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspe�no kreiran");
+                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspešno kreiran");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri kreiranju kupca");
-                return new ResponsePackage<CustomerDataOut?>(null, "Gre�ka pri kreiranju kupca");
+                _logger.LogError(ex, "Greška pri kreiranju kupca");
+                return new ResponsePackage<CustomerDataOut?>(null, "Greška pri kreiranju kupca");
             }
         }
 
@@ -136,14 +226,14 @@ namespace SREES.BLL.Services.Implementation
             {
                 var customer = await _uow.GetCustomerRepository().GetByIdAsync(id);
                 if (customer == null)
-                    return new ResponsePackage<CustomerDataOut?>(null, "Kupac nije prona?en");
+                    return new ResponsePackage<CustomerDataOut?>(null, "Kupac nije pronađen");
 
                 // Provera da li zgrada postoji ako je poslata
                 if (customerDataIn.BuildingId.HasValue)
                 {
                     var building = await _uow.GetBuildingRepository().GetByIdAsync(customerDataIn.BuildingId.Value);
                     if (building == null)
-                        return new ResponsePackage<CustomerDataOut?>(null, "Zgrada nije prona?ena");
+                        return new ResponsePackage<CustomerDataOut?>(null, "Zgrada nije pronađena");
                 }
 
                 customer.FirstName = customerDataIn.FirstName;
@@ -156,13 +246,18 @@ namespace SREES.BLL.Services.Implementation
 
                 await _uow.CompleteAsync();
 
+                // Invalidate all relevant caches after updating a customer
+                await InvalidateCustomerCaches();
+                await _cachingService.RemoveObjectsFromCache($"{CustomerByIdPrefix}:{id}");
+                _logger.LogInformation("Customer caches invalidated after updating customer {CustomerId}", id);
+
                 var customerDataOut = _mapper.Map<CustomerDataOut>(customer);
-                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspe�no a�uriran");
+                return new ResponsePackage<CustomerDataOut?>(customerDataOut, "Kupac uspešno ažuriran");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri a�uriranju kupca sa ID-om {CustomerId}", id);
-                return new ResponsePackage<CustomerDataOut?>(null, "Gre�ka pri a�uriranju kupca");
+                _logger.LogError(ex, "Greška pri ažuriranju kupca sa ID-om {CustomerId}", id);
+                return new ResponsePackage<CustomerDataOut?>(null, "Greška pri ažuriranju kupca");
             }
         }
 
@@ -172,16 +267,22 @@ namespace SREES.BLL.Services.Implementation
             {
                 var customer = await _uow.GetCustomerRepository().GetByIdAsync(id);
                 if (customer == null)
-                    return new ResponsePackage<string>(null, "Kupac nije prona?en");
+                    return new ResponsePackage<string>(null, "Kupac nije pronađen");
 
                 _uow.GetCustomerRepository().RemoveEntity(customer);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<string>(null, "Kupac uspe�no obrisan");
+
+                // Invalidate all relevant caches after deleting a customer
+                await InvalidateCustomerCaches();
+                await _cachingService.RemoveObjectsFromCache($"{CustomerByIdPrefix}:{id}");
+                _logger.LogInformation("Customer caches invalidated after deleting customer {CustomerId}", id);
+
+                return new ResponsePackage<string>(null, "Kupac uspešno obrisan");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri brisanju kupca sa ID-om {CustomerId}", id);
-                return new ResponsePackage<string>(null, "Gre�ka pri brisanju kupca");
+                _logger.LogError(ex, "Greška pri brisanju kupca sa ID-om {CustomerId}", id);
+                return new ResponsePackage<string>(null, "Greška pri brisanju kupca");
             }
         }
 
@@ -189,6 +290,18 @@ namespace SREES.BLL.Services.Implementation
         {
             try
             {
+                // Check cache first
+                if (await _cachingService.ObjectsCached<List<EntityCountStatisticsDataOut>>(CustomerStatisticsCacheKey))
+                {
+                    var cachedStatistics = await _cachingService.GetObjectsFromCache<List<EntityCountStatisticsDataOut>>(CustomerStatisticsCacheKey);
+                    if (cachedStatistics != null)
+                    {
+                        _logger.LogInformation("Customer statistics retrieved from cache");
+                        return new ResponsePackage<List<EntityCountStatisticsDataOut>>(cachedStatistics, "Statistika kupaca uspešno preuzeta iz keša");
+                    }
+                }
+
+                // If not in cache, get from database
                 var customerCountByType = await _uow.GetCustomerRepository().GetCustomerCountByTypeAsync();
                 var statistics = customerCountByType
                     .Select(kvp => new EntityCountStatisticsDataOut
@@ -199,13 +312,70 @@ namespace SREES.BLL.Services.Implementation
                     })
                     .ToList();
 
-                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika kupaca uspe�no preuzeta");
+                // Store in cache
+                await _cachingService.SetObjectsInCache(CustomerStatisticsCacheKey, statistics, CacheExpirationMinutes);
+                _logger.LogInformation("Customer statistics stored in cache");
+
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika kupaca uspešno preuzeta");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gre�ka pri preuzimanju statistike kupaca");
-                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Gre�ka pri preuzimanju statistike kupaca");
+                _logger.LogError(ex, "Greška pri preuzimanju statistike kupaca");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike kupaca");
             }
         }
+
+        #region Private Helper Methods
+
+        /// <summary>
+        /// Generates a cache key for filtered customer queries based on filter parameters
+        /// </summary>
+        private string GenerateFilteredCacheKey(CustomerFilterRequest filterRequest)
+        {
+            var keyParts = new List<string> { CustomerFilteredPrefix };
+
+            keyParts.Add($"Page_{filterRequest.PageNumber}");
+            keyParts.Add($"Size_{filterRequest.PageSize}");
+
+            if (!string.IsNullOrWhiteSpace(filterRequest.SearchTerm))
+                keyParts.Add($"Search_{filterRequest.SearchTerm.ToLower().Replace(" ", "_")}");
+
+            if (filterRequest.CustomerType.HasValue)
+                keyParts.Add($"Type_{filterRequest.CustomerType.Value}");
+
+            if (filterRequest.DateFrom.HasValue)
+                keyParts.Add($"From_{filterRequest.DateFrom.Value:yyyyMMdd}");
+
+            if (filterRequest.DateTo.HasValue)
+                keyParts.Add($"To_{filterRequest.DateTo.Value:yyyyMMdd}");
+
+            return string.Join("|", keyParts);
+        }
+
+        /// <summary>
+        /// Invalidates all customer-related caches
+        /// Called after Create, Update, or Delete operations
+        /// </summary>
+        private async Task InvalidateCustomerCaches()
+        {
+            try
+            {
+                // Invalidate specific cache keys
+                await _cachingService.RemoveObjectsFromCache(AllCustomersCacheKey);
+                await _cachingService.RemoveObjectsFromCache(CustomerSelectCacheKey);
+                await _cachingService.RemoveObjectsFromCache(CustomerStatisticsCacheKey);
+                
+                // Invalidate ALL filtered caches using pattern matching
+                await _cachingService.RemoveObjectsFromCacheByPattern(CustomerFilteredPrefix);
+                
+                _logger.LogInformation("All customer caches invalidated including filtered caches");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error invalidating customer caches, but continuing operation");
+            }
+        }
+
+        #endregion
     }
 }

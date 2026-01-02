@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using SREES.BLL.Mappings;
 using SREES.BLL.Services.Implementation;
 using SREES.BLL.Services.Interfaces;
+using SREES.Common.Services.Implementations;
+using SREES.Common.Services.Interfaces;
 using SREES.DAL.Context;
 using SREES.DAL.Repository.Implementations;
 using SREES.DAL.Repository.Interfaces;
@@ -52,6 +54,7 @@ namespace SREES.API
             // AutoMapper - Dodaj sve profile
             builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile), typeof(BuildingProfile), typeof(FeederProfile), typeof(CustomerProfile));
 
+            builder.Services.AddScoped<ICachingService, CachingService>();
             RegisterRepositories(builder);
             RegisterBllServices(builder);
             RegisterApplicationServices(builder);
