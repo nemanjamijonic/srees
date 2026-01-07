@@ -352,10 +352,7 @@ namespace SREES.BLL.Services.Implementation
             return string.Join("|", keyParts);
         }
 
-        /// <summary>
-        /// Invalidates all customer-related caches
-        /// Called after Create, Update, or Delete operations
-        /// </summary>
+
         private async Task InvalidateCustomerCaches()
         {
             try

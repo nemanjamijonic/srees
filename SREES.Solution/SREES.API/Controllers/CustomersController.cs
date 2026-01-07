@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Customers;
 using SREES.Common.Models.Dtos.Statistics;
@@ -8,6 +9,7 @@ namespace SREES.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerApplicationService _customerApplicationService;
@@ -101,6 +103,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("statistics")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetCustomerStatistics()
         {
             var result = await _customerApplicationService.GetCustomerStatistics();

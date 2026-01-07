@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.DAL.Models;
@@ -7,6 +8,7 @@ namespace SREES.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserApplicationService _userApplicationService;

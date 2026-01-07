@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Poles;
 using SREES.Common.Models.Dtos.Statistics;
@@ -8,6 +9,7 @@ namespace SREES.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class PolesController : ControllerBase
     {
         private readonly IPoleApplicationService _poleApplicationService;
@@ -78,6 +80,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("statistics")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetPoleStatistics()
         {
             var result = await _poleApplicationService.GetPoleStatistics();

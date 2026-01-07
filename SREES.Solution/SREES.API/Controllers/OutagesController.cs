@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Outages;
@@ -8,6 +9,7 @@ namespace SREES.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class OutagesController : ControllerBase
     {
         private readonly IOutageApplicationService _outageApplicationService;
@@ -93,6 +95,7 @@ namespace SREES.API.Controllers
         /// Preuzimanje statistike prekida napajanja po statusu
         /// </summary>
         [HttpGet("statistics")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetOutageStatistics()
         {
             var result = await _outageApplicationService.GetOutageStatistics();

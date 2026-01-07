@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SREES.Common.Models;
 using SREES.Common.Models.Dtos.Feeders;
@@ -8,6 +9,7 @@ namespace SREES.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class FeedersController : ControllerBase
     {
         private readonly IFeederApplicationService _feederApplicationService;
@@ -78,6 +80,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("statistics")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<EntityCountStatisticsDataOut>>>> GetFeederStatistics()
         {
             var result = await _feederApplicationService.GetFeederStatistics();

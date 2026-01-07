@@ -1,4 +1,5 @@
 ﻿using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Auth;
 using SREES.DAL.Models;
 
 namespace SREES.BLL.Services.Interfaces
@@ -10,5 +11,7 @@ namespace SREES.BLL.Services.Interfaces
         Task<ResponsePackage<User?>> CreateUser(User user);
         Task<ResponsePackage<User?>> UpdateUser(int id, User user);
         Task<ResponsePackage<string>> DeleteUser(int id);
+        Task<ResponsePackage<LoginResponse?>> Login(LoginRequest loginRequest);
+        Task<ResponsePackage<LoginResponse?>> Register(RegisterRequest registerRequest);
     }
 }

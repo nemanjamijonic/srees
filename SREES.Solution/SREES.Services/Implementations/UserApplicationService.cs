@@ -1,5 +1,6 @@
 ﻿using SREES.BLL.Services.Interfaces;
 using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Auth;
 using SREES.DAL.Models;
 using SREES.Services.Interfaces;
 
@@ -37,6 +38,16 @@ namespace SREES.Services.Implementations
         public async Task<ResponsePackage<string>> DeleteUser(int id)
         {
             return await _userService.DeleteUser(id);
+        }
+
+        public async Task<ResponsePackage<LoginResponse?>> Login(LoginRequest loginRequest)
+        {
+            return await _userService.Login(loginRequest);
+        }
+
+        public async Task<ResponsePackage<LoginResponse?>> Register(RegisterRequest registerRequest)
+        {
+            return await _userService.Register(registerRequest);
         }
     }
 }

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using SREES.BLL.Mappings;
 using SREES.BLL.Services.Implementation;
 using SREES.BLL.Services.Interfaces;
+using SREES.Common.Helpers;
 using SREES.Common.Services.Implementations;
 using SREES.Common.Services.Interfaces;
 using SREES.DAL.Context;
@@ -51,6 +53,15 @@ namespace SREES.API
                 }
             ));
 
+            // JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = JwtManager.GetTokenValidationParameters();
+                });
+
+            builder.Services.AddAuthorization();
+
             // AutoMapper - Dodaj sve profile
             builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile), typeof(BuildingProfile), typeof(FeederProfile), typeof(CustomerProfile));
 
@@ -76,6 +87,8 @@ namespace SREES.API
 
             app.UseHttpsRedirection();
 
+            // Authentication i Authorization middleware
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

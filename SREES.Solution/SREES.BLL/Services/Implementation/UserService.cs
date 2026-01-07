@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using SREES.BLL.Services.Interfaces;
+using SREES.Common.Helpers;
 using SREES.Common.Models;
+using SREES.Common.Models.Dtos.Auth;
+using SREES.Common.Models.DTOs.Users;
 using SREES.DAL.Models;
 using SREES.DAL.UOW.Interafaces;
 
@@ -105,6 +108,120 @@ namespace SREES.BLL.Services.Implementation
             {
                 _logger.LogError(ex, "Greška pri brisanju korisnika sa ID-om {UserId}", id);
                 return new ResponsePackage<string>("Greška pri brisanju korisnika");
+            }
+        }
+
+        public async Task<ResponsePackage<LoginResponse?>> Login(LoginRequest loginRequest)
+        {
+            try
+            {
+                var user = await _uow.GetUserRepository().GetByEmailAsync(loginRequest.Email);
+                
+                if (user == null)
+                {
+                    _logger.LogWarning("Login attempt with non-existent email: {Email}", loginRequest.Email);
+                    return new ResponsePackage<LoginResponse?>(null, "Nevažeće korisničko ime ili lozinka");
+                }
+
+                // Verify password
+                if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
+                {
+                    _logger.LogWarning("Failed login attempt for user: {Email}", loginRequest.Email);
+                    return new ResponsePackage<LoginResponse?>(null, "Nevažeće korisničko ime ili lozinka");
+                }
+
+                // Generate JWT token
+                var userToken = new UserTokenDto
+                {
+                    Id = user.Id,
+                    Email = user.Email ?? string.Empty,
+                    UserName = user.FirstName + " " + user.LastName,
+                    Role = user.Role
+                };
+
+                var token = JwtManager.GetToken(userToken);
+
+                var loginResponse = new LoginResponse
+                {
+                    Token = token,
+                    UserId = user.Id,
+                    Email = user.Email ?? string.Empty,
+                    FirstName = user.FirstName ?? string.Empty,
+                    LastName = user.LastName ?? string.Empty,
+                    Role = user.Role.ToString()
+                };
+
+                _logger.LogInformation("Successful login for user: {Email}", user.Email);
+                return new ResponsePackage<LoginResponse?>(loginResponse, "Uspešno prijavljivanje");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during login for email: {Email}", loginRequest.Email);
+                return new ResponsePackage<LoginResponse?>(null, "Greška pri prijavljivanju");
+            }
+        }
+
+        public async Task<ResponsePackage<LoginResponse?>> Register(RegisterRequest registerRequest)
+        {
+            try
+            {
+                // Check if user already exists
+                var existingUser = await _uow.GetUserRepository().GetByEmailAsync(registerRequest.Email);
+                if (existingUser != null)
+                {
+                    _logger.LogWarning("Registration attempt with existing email: {Email}", registerRequest.Email);
+                    return new ResponsePackage<LoginResponse?>(null, "Korisnik sa ovom email adresom već postoji");
+                }
+
+                // Hash password
+                var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
+
+                // Create new user
+                var newUser = new User
+                {
+                    FirstName = registerRequest.FirstName,
+                    LastName = registerRequest.LastName,
+                    Email = registerRequest.Email,
+                    PasswordHash = passwordHash,
+                    Role = registerRequest.Role,
+                    Guid = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdateTime = DateTime.UtcNow,
+                    IsDeleted = false
+                };
+
+                await _uow.GetUserRepository().AddAsync(newUser);
+                await _uow.CompleteAsync();
+
+                // Generate JWT token
+
+                var userToken = new UserTokenDto
+                {
+                    Id = newUser.Id,
+                    Email = newUser.Email ?? string.Empty,
+                    UserName = newUser.FirstName + " " + newUser.LastName,
+                    Role = newUser.Role
+                };
+
+                var token = JwtManager.GetToken(userToken);
+
+                var loginResponse = new LoginResponse
+                {
+                    Token = token,
+                    UserId = newUser.Id,
+                    Email = newUser.Email ?? string.Empty,
+                    FirstName = newUser.FirstName ?? string.Empty,
+                    LastName = newUser.LastName ?? string.Empty,
+                    Role = newUser.Role.ToString()
+                };
+
+                _logger.LogInformation("New user registered: {Email}", newUser.Email);
+                return new ResponsePackage<LoginResponse?>(loginResponse, "Uspešno registrovanje");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during registration for email: {Email}", registerRequest.Email);
+                return new ResponsePackage<LoginResponse?>(null, "Greška pri registrovanju");
             }
         }
     }
