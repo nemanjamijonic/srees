@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-// import { AuthService } from './../../services/auth.service.ts';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -15,18 +15,17 @@ export class LayoutComponent {
   isCrudOpen = false;
 
   constructor(
-    // private authService: AuthService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
   get username(): string {
-    return '';
-    // return this.authService.getCurrentUser()?.username || '';
+    const user = this.authService.getCurrentUser();
+    return user ? `${user.firstName} ${user.lastName}` : '';
   }
 
   get userRole(): string {
-    return '';
-    // return this.authService.getCurrentUser()?.role || 'guest';
+    return this.authService.getCurrentUser()?.role || 'guest';
   }
 
   toggleSidebar(): void {
@@ -39,7 +38,7 @@ export class LayoutComponent {
   }
 
   logout(): void {
-    // this.authService.logout();
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 }

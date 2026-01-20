@@ -1,15 +1,29 @@
 <div class="auth-container">
   <div class="auth-card">
     <h2>Register</h2>
+    <div class="alert alert-danger" *ngIf="error">
+      {{ error }}
+    </div>
     <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="firstName">First Name</label>
         <input 
           type="text" 
-          id="username" 
-          name="username" 
+          id="firstName" 
+          name="firstName" 
           class="form-control" 
-          [(ngModel)]="userData.username" 
+          [(ngModel)]="userData.firstName" 
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input 
+          type="text" 
+          id="lastName" 
+          name="lastName" 
+          class="form-control" 
+          [(ngModel)]="userData.lastName" 
           required>
       </div>
       

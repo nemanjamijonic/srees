@@ -79,6 +79,16 @@
           <p class="kpi-label">Feeders</p>
         </div>
       </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-danger">
+          <i class="bi bi-building"></i>
+        </div>
+        <div class="kpi-info">
+          <h3 class="kpi-value">{{ stats.totalBuildings }}</h3>
+          <p class="kpi-label">Buildings</p>
+        </div>
+      </div>
     </div>
 
     <!-- Charts Grid -->
@@ -108,6 +118,13 @@
       <div class="chart-card">
         <div class="chart-container">
           <canvas id="feederTypeChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Substation Type Chart -->
+      <div class="chart-card">
+        <div class="chart-container">
+          <canvas id="substationTypeChart"></canvas>
         </div>
       </div>
     </div>

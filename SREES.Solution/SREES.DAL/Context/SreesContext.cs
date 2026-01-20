@@ -185,6 +185,23 @@ namespace SREES.DAL.Context
                 entity.Property(e => e.Description)
                     .HasMaxLength(1000);
 
+                entity.Property(e => e.ReportedLatitude)
+                    .HasPrecision(10, 6);
+
+                entity.Property(e => e.ReportedLongitude)
+                    .HasPrecision(10, 6);
+
+                entity.Property(e => e.ReportedAddress)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.DetectedLevel)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Severity)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.Guid)
                     .HasDefaultValueSql("NEWID()")
                     .ValueGeneratedOnAdd();
@@ -209,16 +226,128 @@ namespace SREES.DAL.Context
                 entity.HasIndex(e => e.OutageStatus)
                     .HasName("IX_Outage_Status");
 
+                entity.HasIndex(e => e.OutageGroupId)
+                    .HasName("IX_Outage_GroupId");
+
                 entity.HasIndex(e => e.IsDeleted)
                     .HasName("IX_Outage_IsDeleted");
 
-                // Foreign key relationship
+                // Foreign key relationships
                 entity.HasOne(o => o.User)
                     .WithMany()
                     .HasForeignKey(o => o.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                entity.HasOne(o => o.Region)
+                    .WithMany()
+                    .HasForeignKey(o => o.RegionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(o => o.Customer)
+                    .WithMany()
+                    .HasForeignKey(o => o.CustomerId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(o => o.Building)
+                    .WithMany()
+                    .HasForeignKey(o => o.BuildingId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(o => o.DetectedSubstation)
+                    .WithMany()
+                    .HasForeignKey(o => o.DetectedSubstationId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(o => o.DetectedFeeder)
+                    .WithMany()
+                    .HasForeignKey(o => o.DetectedFeederId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(o => o.DetectedPole)
+                    .WithMany()
+                    .HasForeignKey(o => o.DetectedPoleId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(o => o.OutageGroup)
+                    .WithMany(og => og.Outages)
+                    .HasForeignKey(o => o.OutageGroupId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
                 entity.ToTable("Outages", schema: "dbo");
+            });
+
+            // Konfiguracija OutageGroup entiteta
+            modelBuilder.Entity<OutageGroup>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.GroupName)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(e => e.DetectedLevel)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Severity)
+                    .HasConversion<string>()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.RegionId)
+                    .IsRequired();
+
+                entity.Property(e => e.Guid)
+                    .HasDefaultValueSql("NEWID()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(e => e.RegionId)
+                    .HasName("IX_OutageGroup_RegionId");
+
+                entity.HasIndex(e => e.Severity)
+                    .HasName("IX_OutageGroup_Severity");
+
+                entity.HasIndex(e => e.IsResolved)
+                    .HasName("IX_OutageGroup_IsResolved");
+
+                entity.HasIndex(e => e.IsDeleted)
+                    .HasName("IX_OutageGroup_IsDeleted");
+
+                // Foreign key relationships
+                entity.HasOne(og => og.Region)
+                    .WithMany()
+                    .HasForeignKey(og => og.RegionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(og => og.DetectedSubstation)
+                    .WithMany()
+                    .HasForeignKey(og => og.DetectedSubstationId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(og => og.DetectedFeeder)
+                    .WithMany()
+                    .HasForeignKey(og => og.DetectedFeederId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(og => og.DetectedPole)
+                    .WithMany()
+                    .HasForeignKey(og => og.DetectedPoleId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.ToTable("OutageGroups", schema: "dbo");
             });
 
             // Konfiguracija Pole entiteta
@@ -444,6 +573,7 @@ namespace SREES.DAL.Context
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Outage> Outages { get; set; }
+        public virtual DbSet<OutageGroup> OutageGroups { get; set; }
         public virtual DbSet<Substation> Substations { get; set; }
         public virtual DbSet<Region> Regions { get; set; }
         public virtual DbSet<Building> Buildings { get; set; }

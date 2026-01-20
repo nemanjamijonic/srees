@@ -76,7 +76,6 @@ export class PolesComponent implements OnInit {
       poleType: pole.poleType,
       regionId: pole.regionId
     };
-    console.log('Edit modal opened with:', this.poleForm);
     this.showModal = true;
   }
 

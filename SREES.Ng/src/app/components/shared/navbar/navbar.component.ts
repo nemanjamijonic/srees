@@ -22,7 +22,8 @@ export class NavbarComponent {
   }
 
   get username(): string {
-    return this.authService.getCurrentUser()?.username || '';
+    const user = this.authService.getCurrentUser();
+    return user ? `${user.firstName} ${user.lastName}` : '';
   }
 
   get userRole(): string {

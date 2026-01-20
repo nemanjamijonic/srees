@@ -1,53 +1,71 @@
-// import { Injectable } from '@angular/core';
-// import { BehaviorSubject, Observable } from 'rxjs';
-// import { User, UserRole } from '../models/index';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, map } from 'rxjs';
+import { LoginRequest } from '../models/login-request.model';
+import { ResponsePackage } from '../models/response-package.model';
+import { LoginResponse } from '../models/login-response.model';
+import { RegisterRequest } from '../models/register-request.model';
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class AuthService {
-//   private currentUserSubject = new BehaviorSubject<User | null>(null);
-//   public currentUser$ = this.currentUserSubject.asObservable();
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = 'https://localhost:7058/api/auth';
+  private userSubject = new BehaviorSubject<LoginResponse | null>(null);
+  public user$ = this.userSubject.asObservable();
 
-//   constructor() {
-//     const storedUser = localStorage.getItem('currentUser');
-//     if (storedUser) {
-//       this.currentUserSubject.next(JSON.parse(storedUser));
-//     }
-//   }
+  constructor(private http: HttpClient) {
+    // Attempt to load stored user from localStorage on initialization
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        this.userSubject.next(JSON.parse(storedUser));
+      } catch (e) {
+        localStorage.removeItem('user');
+      }
+    }
+  }
 
-//   login(username: string, password: string): Observable<boolean> {
-//     // Mock authentication - replace with real API call
-//     return new Observable(observer => {
-//       setTimeout(() => {
-//         if (username && password) {
-//           const user: User = {
-//             id: '1',
-//             username: username,
-//             email: `${username}@example.com`,
-//             role: username === 'admin' ? UserRole.ADMIN : UserRole.CUSTOMER
-//           };
-          
-//           localStorage.setItem('currentUser', JSON.stringify(user));
-//           this.currentUserSubject.next(user);
-//           observer.next(true);
-//         } else {
-//           observer.next(false);
-//         }
-//         observer.complete();
-//       }, 1000);
-//     });
-//   }
+  public get currentUserValue(): LoginResponse | null {
+    return this.userSubject.value;
+  }
 
-//   register(userData: any): Observable<boolean> {
-//     // Mock registration - replace with real API call
-//     return new Observable(observer => {
-//       setTimeout(() => {
-//         const user: User = {
-//           id: Date.now().toString(),
-//           username: userData.username,
-//           email: userData.email,
-//           role: UserRole.CUSTOMER
+  login(loginRequest: LoginRequest): Observable<ResponsePackage<LoginResponse>> {
+    return this.http.post<ResponsePackage<LoginResponse>>(`${this.apiUrl}/login`, loginRequest)
+      .pipe(map(response => {
+        if (response.data) {
+          localStorage.setItem('user', JSON.stringify(response.data));
+          this.userSubject.next(response.data);
+        }
+        return response;
+      }));
+  }
+
+  register(registerRequest: RegisterRequest): Observable<ResponsePackage<LoginResponse>> {
+    return this.http.post<ResponsePackage<LoginResponse>>(`${this.apiUrl}/register`, registerRequest)
+      .pipe(map(response => {
+        // Automatically login after successful registration if token is returned
+        if (response.data) {
+          localStorage.setItem('user', JSON.stringify(response.data));
+          this.userSubject.next(response.data);
+        }
+        return response;
+      }));
+  }
+
+  logout() {
+    localStorage.removeItem('user');
+    this.userSubject.next(null);
+  }
+
+  isLoggedIn(): boolean {
+    return this.userSubject.value !== null;
+  }
+
+  getCurrentUser(): LoginResponse | null {
+    return this.userSubject.value;
+  }
+}
 //         };
         
 //         localStorage.setItem('currentUser', JSON.stringify(user));

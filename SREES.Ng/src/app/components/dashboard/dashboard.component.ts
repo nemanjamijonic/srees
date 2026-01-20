@@ -9,6 +9,7 @@ import { PoleService } from '../../services/pole.service';
 import { FeederService } from '../../services/feeder.service';
 import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { BuildingService } from '../../services/building.service';
 
 Chart.register(...registerables);
 
@@ -29,7 +30,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     totalRegions: 0,
     totalSubstations: 0,
     totalPoles: 0,
-    totalFeeders: 0
+    totalFeeders: 0,
+    totalBuildings: 0
   };
 
   // Loading state
@@ -41,7 +43,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     private regionService: RegionService,
     private substationService: SubstationService,
     private poleService: PoleService,
-    private feederService: FeederService
+    private feederService: FeederService,
+    private buildingService: BuildingService
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +61,15 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroyCharts();
   }
 
+  private formatLabel(label: string): string {
+    return label
+      .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between lowercase and uppercase
+      .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2') // Add space between consecutive capitals followed by lowercase
+      .replace(/([a-zA-Z])([0-9])/g, '$1 $2') // Add space between letter and number
+      .replace(/([0-9])([a-zA-Z])/g, '$1 $2') // Add space between number and letter
+      .trim();
+  }
+
   loadDashboardData(): void {
     this.isLoading = true;
 
@@ -67,7 +79,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       regionStats: this.regionService.getStatistics(),
       substationStats: this.substationService.getStatistics(),
       poleStats: this.poleService.getStatistics(),
-      feederStats: this.feederService.getStatistics()
+      feederStats: this.feederService.getStatistics(),
+      buildingStats: this.buildingService.getStatistics()
     })
     .pipe(takeUntil(this.destroy$))
     .subscribe({
@@ -80,7 +93,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         this.stats.totalSubstations = (data.substationStats.data || []).reduce((sum, stat) => sum + stat.count, 0);
         this.stats.totalPoles = (data.poleStats.data || []).reduce((sum, stat) => sum + stat.count, 0);
         this.stats.totalFeeders = (data.feederStats.data || []).reduce((sum, stat) => sum + stat.count, 0);
-
+        this.stats.totalBuildings = (data.buildingStats.data || []).reduce((sum, stat) => sum + stat.count, 0);
         this.isLoading = false;
         
         setTimeout(() => {
@@ -88,7 +101,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 100);
       },
       error: (error) => {
-        console.error('Error loading dashboard data:', error);
         this.isLoading = false;
       }
     });
@@ -100,11 +112,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.createCustomerTypeChart(data.customerStats.data || []);
     this.createPoleTypeChart(data.poleStats.data || []);
     this.createFeederTypeChart(data.feederStats.data || []);
+    this.createSubstationTypeChart(data.substationStats.data || []);
   }
 
   createOutageStatusChart(stats: any[]): void {
-    console.log('Creating Outage Status Chart with stats:', stats);
-    
     const statusMap: any = {};
     stats.forEach(stat => {
       statusMap[stat.name] = stat.count;
@@ -112,7 +123,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const canvas = document.getElementById('outageStatusChart') as HTMLCanvasElement;
     if (!canvas) {
-      console.error('Canvas element outageStatusChart not found!');
       return;
     }
 
@@ -168,15 +178,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   createCustomerTypeChart(stats: any[]): void {
-    console.log('Creating Customer Type Chart with stats:', stats);
-    
-    const labels = stats.map(stat => stat.name);
+    const labels = stats.map(stat => this.formatLabel(stat.name));
     const data = stats.map(stat => stat.count);
 
-    console.log('Customer type labels:', labels, 'data:', data);
     const canvas = document.getElementById('customerTypeChart') as HTMLCanvasElement;
     if (!canvas) {
-      console.error('Canvas element customerTypeChart not found!');
       return;
     }
 
@@ -230,15 +236,11 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   createPoleTypeChart(stats: any[]): void {
-    console.log('Creating Pole Type Chart with stats:', stats);
-    
-    const labels = stats.map(stat => stat.name);
+    const labels = stats.map(stat => this.formatLabel(stat.name));
     const data = stats.map(stat => stat.count);
 
-    console.log('Pole type labels:', labels, 'data:', data);
     const canvas = document.getElementById('poleTypeChart') as HTMLCanvasElement;
     if (!canvas) {
-      console.error('Canvas element poleTypeChart not found!');
       return;
     }
 
@@ -290,24 +292,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   createFeederTypeChart(stats: any[]): void {
-    console.log('Creating Feeder Type Chart with stats:', stats);
-    
-    const labels = stats.map(stat => stat.name);
+    const labels = stats.map(stat => this.formatLabel(stat.name));
     const data = stats.map(stat => stat.count);
 
-    console.log('Feeder type labels:', labels, 'data:', data);
     const canvas = document.getElementById('feederTypeChart') as HTMLCanvasElement;
     if (!canvas) {
-      console.error('Canvas element feederTypeChart not found!');
       return;
     }
 
     const config: ChartConfiguration = {
-      type: 'bar',
+      type: 'pie',
       data: {
         labels: labels,
         datasets: [{
-          label: 'Number of Feeders',
           data: data,
           backgroundColor: [
             'rgba(0, 123, 255, 0.8)',      // F11 - Blue
@@ -317,8 +314,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
             'rgba(0, 123, 255, 1)',
             'rgba(111, 66, 193, 1)'
           ],
-          borderWidth: 2,
-          borderRadius: 8
+          borderWidth: 2
         }]
       },
       options: {
@@ -326,7 +322,13 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 12
+              }
+            }
           },
           title: {
             display: true,
@@ -336,12 +338,62 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
               weight: 'bold'
             }
           }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              precision: 0
+        }
+      }
+    };
+
+    this.charts.push(new Chart(canvas, config));
+  }
+
+  createSubstationTypeChart(stats: any[]): void {
+    const labels = stats.map(stat => this.formatLabel(stat.name));
+    const data = stats.map(stat => stat.count);
+
+    const canvas = document.getElementById('substationTypeChart') as HTMLCanvasElement;
+    if (!canvas) {
+      return;
+    }
+
+    const config: ChartConfiguration = {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            'rgba(220, 53, 69, 0.8)',      // Transmission - Red
+            'rgba(0, 123, 255, 0.8)',      // Injection - Blue
+            'rgba(40, 167, 69, 0.8)',      // Distribution - Green
+            'rgba(253, 126, 20, 0.8)'      // Bulk Supply - Orange
+          ],
+          borderColor: [
+            'rgba(220, 53, 69, 1)',
+            'rgba(0, 123, 255, 1)',
+            'rgba(40, 167, 69, 1)',
+            'rgba(253, 126, 20, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 12
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: 'Substations by Type',
+            font: {
+              size: 16,
+              weight: 'bold'
             }
           }
         }

@@ -87,7 +87,6 @@ export class BuildingsComponent implements OnInit {
       regionId: building.regionId,
       poleId: building.poleId
     };
-    console.log('Edit modal opened with:', this.buildingForm);
     this.showModal = true;
   }
 

@@ -212,7 +212,6 @@ export class CustomersComponent implements OnInit {
       isActive: customer.isActive,
       customerType: customer.customerType
     };
-    console.log('Edit modal opened with:', this.customerForm);
     this.showModal = true;
   }
 

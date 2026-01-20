@@ -9,6 +9,7 @@ import { EntityCountStatistics } from '../models/statistics.model';
 })
 export class CustomerService {
   private apiUrl = 'https://localhost:7058/api/customers';
+  private headers = { 'Content-Type': 'application/json' };
 
   constructor(private http: HttpClient) { }
 

@@ -81,7 +81,6 @@ export class FeedersComponent implements OnInit {
       substationId: feeder.substationId,
       suppliedRegions: feeder.suppliedRegions || []
     };
-    console.log('Edit modal opened with:', this.feederForm);
     this.showModal = true;
   }
 

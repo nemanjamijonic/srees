@@ -39,7 +39,6 @@ export class OutagesComponent implements OnInit {
         this.outages = response.data;
       },
       error: (error) => {
-        console.error('Error loading outages:', error);
       }
     });
   }

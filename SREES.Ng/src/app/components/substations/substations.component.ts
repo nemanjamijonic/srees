@@ -74,7 +74,6 @@ export class SubstationsComponent implements OnInit {
       longitude: substation.longitude,
       regionId: substation.regionId
     };
-    console.log('Edit modal opened with:', this.substationForm);
     this.showModal = true;
   }
 
