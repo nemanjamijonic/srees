@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Substation, CreateSubstationRequest, UpdateSubstationRequest, SubstationSelectOption } from '../models/substation.model';
+import { Substation, CreateSubstationRequest, UpdateSubstationRequest, SubstationSelectOption, SubstationFilterRequest, PaginatedResponse } from '../models/substation.model';
 import { ApiResponse } from '../models/region.model';
 import { EntityCountStatistics } from '../models/statistics.model';
 
@@ -39,5 +39,19 @@ export class SubstationService {
 
   getStatistics(): Observable<ApiResponse<EntityCountStatistics[]>> {
     return this.http.get<ApiResponse<EntityCountStatistics[]>>(`${this.apiUrl}/statistics`);
+  }
+
+  getFiltered(filterRequest: SubstationFilterRequest): Observable<ApiResponse<PaginatedResponse<Substation[]>>> {
+    let params = new HttpParams()
+      .set('pageNumber', filterRequest.pageNumber.toString())
+      .set('pageSize', filterRequest.pageSize.toString());
+
+    if (filterRequest.searchTerm) params = params.set('searchTerm', filterRequest.searchTerm);
+    if (filterRequest.substationType !== undefined && filterRequest.substationType !== null)
+      params = params.set('substationType', filterRequest.substationType.toString());
+    if (filterRequest.dateFrom) params = params.set('dateFrom', filterRequest.dateFrom);
+    if (filterRequest.dateTo) params = params.set('dateTo', filterRequest.dateTo);
+
+    return this.http.get<ApiResponse<PaginatedResponse<Substation[]>>>(`${this.apiUrl}/filtered`, { params });
   }
 }

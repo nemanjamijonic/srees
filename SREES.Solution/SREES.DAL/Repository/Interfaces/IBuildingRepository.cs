@@ -1,3 +1,4 @@
+using SREES.Common.Models.Dtos.Buildings;
 using SREES.Common.Repositories.Interfaces;
 using SREES.DAL.Models;
 
@@ -7,5 +8,6 @@ namespace SREES.DAL.Repository.Interfaces
     {
         Task<IEnumerable<Building>> GetAllWithPoleAsync();
         Task<int> GetTotalBuildingCountAsync();
+        Task<(IEnumerable<Building> Buildings, int TotalCount)> GetBuildingsFilteredAsync(BuildingFilterRequest filterRequest);
     }
 }

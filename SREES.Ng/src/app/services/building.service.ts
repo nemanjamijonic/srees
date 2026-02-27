@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Building, CreateBuildingRequest, UpdateBuildingRequest, BuildingSelectOption, ApiResponse } from '../models/building.model';
+import { Building, CreateBuildingRequest, UpdateBuildingRequest, BuildingSelectOption, BuildingFilterRequest, PaginatedResponse, ApiResponse } from '../models/building.model';
 import { EntityCountStatistics } from '../models/statistics.model';
 
 @Injectable({
@@ -14,6 +14,27 @@ export class BuildingService {
 
   getAll(): Observable<ApiResponse<Building[]>> {
     return this.http.get<ApiResponse<Building[]>>(this.apiUrl);
+  }
+
+  getFiltered(filterRequest: BuildingFilterRequest): Observable<ApiResponse<PaginatedResponse<Building[]>>> {
+    let params = new HttpParams()
+      .set('pageNumber', filterRequest.pageNumber.toString())
+      .set('pageSize', filterRequest.pageSize.toString());
+
+    if (filterRequest.searchTerm) {
+      params = params.set('searchTerm', filterRequest.searchTerm);
+    }
+    if (filterRequest.poleType !== undefined && filterRequest.poleType !== null) {
+      params = params.set('poleType', filterRequest.poleType.toString());
+    }
+    if (filterRequest.dateFrom) {
+      params = params.set('dateFrom', filterRequest.dateFrom);
+    }
+    if (filterRequest.dateTo) {
+      params = params.set('dateTo', filterRequest.dateTo);
+    }
+
+    return this.http.get<ApiResponse<PaginatedResponse<Building[]>>>(`${this.apiUrl}/filtered`, { params });
   }
 
   getAllForSelect(): Observable<ApiResponse<BuildingSelectOption[]>> {

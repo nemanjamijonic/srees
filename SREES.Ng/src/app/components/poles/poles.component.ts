@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PoleService } from '../../services/pole.service';
 import { RegionService } from '../../services/region.service';
-import { Pole, CreatePoleRequest, UpdatePoleRequest } from '../../models/pole.model';
+import { Pole, CreatePoleRequest, UpdatePoleRequest, PoleFilterRequest } from '../../models/pole.model';
 import { RegionSelectOption } from '../../models/region-select.model';
 
 @Component({
@@ -20,7 +20,23 @@ export class PolesComponent implements OnInit {
   showDeleteModal = false;
   isEdit = false;
   selectedPole: Pole | null = null;
-  
+  Math = Math;
+
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
+  totalPages = 0;
+  pages: number[] = [];
+
+  // Filter
+  filterRequest: PoleFilterRequest = {
+    pageNumber: 1,
+    pageSize: 10
+  };
+
+  appliedFilters: { key: string; label: string; value: string }[] = [];
+
   poleForm: CreatePoleRequest = {
     name: '',
     latitude: 0,
@@ -36,13 +52,21 @@ export class PolesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadPoles();
+    this.loadPolesFiltered();
     this.loadRegionOptions();
   }
 
-  loadPoles() {
-    this.poleService.getAll().subscribe(response => {
-      this.poles = response.data;
+  loadPolesFiltered() {
+    this.filterRequest.pageNumber = this.currentPage;
+    this.filterRequest.pageSize = this.pageSize;
+
+    this.poleService.getFiltered(this.filterRequest).subscribe(response => {
+      if (response.data) {
+        this.poles = response.data.data;
+        this.totalCount = response.data.totalCount;
+        this.totalPages = response.data.totalPages;
+        this.generatePages();
+      }
     });
   }
 
@@ -50,6 +74,74 @@ export class PolesComponent implements OnInit {
     this.regionService.getAllForSelect().subscribe(response => {
       this.regionOptions = response.data;
     });
+  }
+
+  applyFilters() {
+    this.currentPage = 1;
+    this.updateAppliedFilters();
+    this.loadPolesFiltered();
+  }
+
+  resetFilters() {
+    this.filterRequest = { pageNumber: 1, pageSize: this.pageSize };
+    this.appliedFilters = [];
+    this.currentPage = 1;
+    this.loadPolesFiltered();
+  }
+
+  removeFilter(key: string) {
+    (this.filterRequest as any)[key] = undefined;
+    this.currentPage = 1;
+    this.updateAppliedFilters();
+    this.loadPolesFiltered();
+  }
+
+  updateAppliedFilters() {
+    this.appliedFilters = [];
+    if (this.filterRequest.searchTerm) {
+      this.appliedFilters.push({ key: 'searchTerm', label: 'Search', value: this.filterRequest.searchTerm });
+    }
+    if (this.filterRequest.poleType !== undefined && this.filterRequest.poleType !== null) {
+      this.appliedFilters.push({ key: 'poleType', label: 'Type', value: this.getPoleTypeName(this.filterRequest.poleType) });
+    }
+    if (this.filterRequest.dateFrom) {
+      this.appliedFilters.push({ key: 'dateFrom', label: 'From', value: this.filterRequest.dateFrom });
+    }
+    if (this.filterRequest.dateTo) {
+      this.appliedFilters.push({ key: 'dateTo', label: 'To', value: this.filterRequest.dateTo });
+    }
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadPolesFiltered();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadPolesFiltered();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadPolesFiltered();
+    }
+  }
+
+  generatePages() {
+    const maxVisible = 5;
+    const half = Math.floor(maxVisible / 2);
+    let start = Math.max(1, this.currentPage - half);
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    this.pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
   openCreateModal() {
@@ -91,11 +183,9 @@ export class PolesComponent implements OnInit {
   }
 
   savePole() {
-    // Convert string values to numbers for poleType and regionId
     const poleTypeNumber = +this.poleForm.poleType;
     const regionIdNumber = +this.poleForm.regionId;
-    
-    // Validate that valid options are selected
+
     if (poleTypeNumber < 0 || regionIdNumber <= 0) {
       alert('Please select valid Pole Type and Region');
       return;
@@ -109,12 +199,12 @@ export class PolesComponent implements OnInit {
 
     if (this.isEdit && this.selectedPole) {
       this.poleService.update(this.selectedPole.id, requestData).subscribe(() => {
-        this.loadPoles();
+        this.loadPolesFiltered();
         this.closeModal();
       });
     } else {
       this.poleService.create(requestData).subscribe(() => {
-        this.loadPoles();
+        this.loadPolesFiltered();
         this.closeModal();
       });
     }
@@ -123,7 +213,7 @@ export class PolesComponent implements OnInit {
   deletePole() {
     if (this.selectedPole) {
       this.poleService.delete(this.selectedPole.id).subscribe(() => {
-        this.loadPoles();
+        this.loadPolesFiltered();
         this.closeModal();
       });
     }
@@ -140,6 +230,15 @@ export class PolesComponent implements OnInit {
       case 1: return 'MV Pole';
       case 2: return 'LV Pole';
       default: return 'Unknown Type';
+    }
+  }
+
+  getPoleTypeClass(poleType: number): string {
+    switch (poleType) {
+      case 0: return 'bg-hv';
+      case 1: return 'bg-mv';
+      case 2: return 'bg-lv';
+      default: return 'bg-secondary';
     }
   }
 }

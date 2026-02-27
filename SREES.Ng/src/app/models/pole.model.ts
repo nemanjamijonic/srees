@@ -38,3 +38,20 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+export interface PoleFilterRequest {
+  searchTerm?: string;
+  poleType?: number;
+  dateFrom?: string;
+  dateTo?: string;
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface PaginatedResponse<T> {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  data: T;
+}

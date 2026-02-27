@@ -28,12 +28,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var substations = await _uow.GetSubstationRepository().GetAllAsync();
                 var substationList = _mapper.Map<List<SubstationDataOut>>(substations.ToList());
-                return new ResponsePackage<List<SubstationDataOut>>(substationList, "Transformatorske stanice uspešno preuzete");
+                return new ResponsePackage<List<SubstationDataOut>>(substationList, "Transformatorske stanice uspeï¿½no preuzete");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju svih transformatorskih stanica");
-                return new ResponsePackage<List<SubstationDataOut>>(null, "Greška pri preuzimanju transformatorskih stanica");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju svih transformatorskih stanica");
+                return new ResponsePackage<List<SubstationDataOut>>(null, "Greï¿½ka pri preuzimanju transformatorskih stanica");
             }
         }
 
@@ -43,12 +43,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var substations = await _uow.GetSubstationRepository().GetAllAsync();
                 var substationSelectList = _mapper.Map<List<SubstationSelectDataOut>>(substations.ToList());
-                return new ResponsePackage<List<SubstationSelectDataOut>>(substationSelectList, "Transformatorske stanice za select uspešno preuzete");
+                return new ResponsePackage<List<SubstationSelectDataOut>>(substationSelectList, "Transformatorske stanice za select uspeï¿½no preuzete");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju transformatorskih stanica za select");
-                return new ResponsePackage<List<SubstationSelectDataOut>>(null, "Greška pri preuzimanju transformatorskih stanica za select");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju transformatorskih stanica za select");
+                return new ResponsePackage<List<SubstationSelectDataOut>>(null, "Greï¿½ka pri preuzimanju transformatorskih stanica za select");
             }
         }
 
@@ -61,12 +61,12 @@ namespace SREES.BLL.Services.Implementation
                     return new ResponsePackage<SubstationDataOut?>(null, "Transformatorska stanica nije prona?ena");
 
                 var substationDataOut = _mapper.Map<SubstationDataOut>(substation);
-                return new ResponsePackage<SubstationDataOut?>(substationDataOut, "Transformatorska stanica uspešno preuzeta");
+                return new ResponsePackage<SubstationDataOut?>(substationDataOut, "Transformatorska stanica uspeï¿½no preuzeta");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju transformatorske stanice sa ID-om {SubstationId}", id);
-                return new ResponsePackage<SubstationDataOut?>(null, "Greška pri preuzimanju transformatorske stanice");
+                _logger.LogError(ex, "Greï¿½ka pri preuzimanju transformatorske stanice sa ID-om {SubstationId}", id);
+                return new ResponsePackage<SubstationDataOut?>(null, "Greï¿½ka pri preuzimanju transformatorske stanice");
             }
         }
 
@@ -92,12 +92,12 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var substationDataOut = _mapper.Map<SubstationDataOut>(substation);
-                return new ResponsePackage<SubstationDataOut?>(substationDataOut, "Transformatorska stanica uspešno kreirana");
+                return new ResponsePackage<SubstationDataOut?>(substationDataOut, "Transformatorska stanica uspeï¿½no kreirana");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri kreiranju transformatorske stanice");
-                return new ResponsePackage<SubstationDataOut?>(null, "Greška pri kreiranju transformatorske stanice");
+                _logger.LogError(ex, "Greï¿½ka pri kreiranju transformatorske stanice");
+                return new ResponsePackage<SubstationDataOut?>(null, "Greï¿½ka pri kreiranju transformatorske stanice");
             }
         }
 
@@ -124,12 +124,12 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var substationDataOut = _mapper.Map<SubstationDataOut>(substation);
-                return new ResponsePackage<SubstationDataOut?>(substationDataOut, "Transformatorska stanica uspešno ažurirana");
+                return new ResponsePackage<SubstationDataOut?>(substationDataOut, "Transformatorska stanica uspeï¿½no aï¿½urirana");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri ažuriranju transformatorske stanice sa ID-om {SubstationId}", id);
-                return new ResponsePackage<SubstationDataOut?>(null, "Greška pri ažuriranju transformatorske stanice");
+                _logger.LogError(ex, "Greï¿½ka pri aï¿½uriranju transformatorske stanice sa ID-om {SubstationId}", id);
+                return new ResponsePackage<SubstationDataOut?>(null, "Greï¿½ka pri aï¿½uriranju transformatorske stanice");
             }
         }
 
@@ -166,12 +166,35 @@ namespace SREES.BLL.Services.Implementation
                     })
                     .ToList();
 
-                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika transformatorskih stanica uspešno preuzeta");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(statistics, "Statistika transformatorskih stanica uspeÅ¡no preuzeta");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greška pri preuzimanju statistike transformatorskih stanica");
-                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike transformatorskih stanica");
+                _logger.LogError(ex, "GreÅ¡ka pri preuzimanju statistike transformatorskih stanica");
+                return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "GreÅ¡ka pri preuzimanju statistike transformatorskih stanica");
+            }
+        }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>> GetSubstationsFiltered(SubstationFilterRequest filterRequest)
+        {
+            try
+            {
+                var (substations, totalCount) = await _uow.GetSubstationRepository().GetSubstationsFilteredAsync(filterRequest);
+                var substationList = _mapper.Map<List<SubstationDataOut>>(substations.ToList());
+
+                var paginatedResponse = new PaginatedResponse<List<SubstationDataOut>>(
+                    substationList,
+                    totalCount,
+                    filterRequest.PageNumber,
+                    filterRequest.PageSize
+                );
+
+                return new ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>(paginatedResponse, "Transformatorske stanice uspeÅ¡no filtrirane");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GreÅ¡ka pri filtriranju transformatorskih stanica");
+                return new ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>(null, "GreÅ¡ka pri filtriranju transformatorskih stanica");
             }
         }
     }

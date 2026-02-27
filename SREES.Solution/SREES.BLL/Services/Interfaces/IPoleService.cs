@@ -13,5 +13,6 @@ namespace SREES.BLL.Services.Interfaces
         Task<ResponsePackage<PoleDataOut?>> UpdatePole(int id, PoleDataIn poleDataIn);
         Task<ResponsePackage<string>> DeletePole(int id);
         Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetPoleStatistics();
+        Task<ResponsePackage<PaginatedResponse<List<PoleDataOut>>>> GetPolesFiltered(PoleFilterRequest filterRequest);
     }
 }

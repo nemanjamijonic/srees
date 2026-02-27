@@ -37,6 +37,30 @@ namespace SREES.BLL.Services.Implementation
             }
         }
 
+        public async Task<ResponsePackage<PaginatedResponse<List<FeederDataOut>>>> GetFeedersFiltered(FeederFilterRequest filterRequest)
+        {
+            try
+            {
+                var (feeders, totalCount) = await _uow.GetFeederRepository().GetFeedersFilteredAsync(filterRequest);
+
+                var feederList = _mapper.Map<List<FeederDataOut>>(feeders.ToList());
+                var paginatedResponse = new PaginatedResponse<List<FeederDataOut>>(
+                    feederList,
+                    totalCount,
+                    filterRequest.PageNumber,
+                    filterRequest.PageSize);
+
+                return new ResponsePackage<PaginatedResponse<List<FeederDataOut>>>(
+                    paginatedResponse,
+                    "Feeders successfully retrieved");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving filtered feeders");
+                return new ResponsePackage<PaginatedResponse<List<FeederDataOut>>>(null, "Error retrieving feeders");
+            }
+        }
+
         public async Task<ResponsePackage<List<FeederSelectDataOut>>> GetAllFeedersForSelect()
         {
             try

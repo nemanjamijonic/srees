@@ -94,6 +94,10 @@ export class CustomersComponent implements OnInit {
     this.loadCustomers();
   }
 
+  resetFilters() {
+    this.clearFilters();
+  }
+
   removeFilter(key: string) {
     switch(key) {
       case 'searchTerm':

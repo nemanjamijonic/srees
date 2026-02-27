@@ -161,5 +161,28 @@ namespace SREES.BLL.Services.Implementation
                 return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike regiona");
             }
         }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<RegionDataOut>>>> GetRegionsFiltered(RegionFilterRequest filterRequest)
+        {
+            try
+            {
+                var (regions, totalCount) = await _uow.GetRegionRepository().GetRegionsFilteredAsync(filterRequest);
+                var regionList = _mapper.Map<List<RegionDataOut>>(regions.ToList());
+
+                var paginatedResponse = new PaginatedResponse<List<RegionDataOut>>(
+                    regionList,
+                    totalCount,
+                    filterRequest.PageNumber,
+                    filterRequest.PageSize
+                );
+
+                return new ResponsePackage<PaginatedResponse<List<RegionDataOut>>>(paginatedResponse, "Regije uspešno filtrirane");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri filtriranju regija");
+                return new ResponsePackage<PaginatedResponse<List<RegionDataOut>>>(null, "Greška pri filtriranju regija");
+            }
+        }
     }
 }

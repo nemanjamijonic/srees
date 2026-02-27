@@ -26,6 +26,13 @@ namespace SREES.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("filtered")]
+        public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<FeederDataOut>>>>> GetFeedersFiltered([FromQuery] FeederFilterRequest filterRequest)
+        {
+            var result = await _feederApplicationService.GetFeedersFiltered(filterRequest);
+            return Ok(result);
+        }
+
         [HttpGet("select")]
         public async Task<ActionResult<ResponsePackage<List<FeederSelectDataOut>>>> GetAllFeedersForSelect()
         {

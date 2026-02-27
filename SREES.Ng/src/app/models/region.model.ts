@@ -24,3 +24,19 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+export interface RegionFilterRequest {
+  searchTerm?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T;
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}

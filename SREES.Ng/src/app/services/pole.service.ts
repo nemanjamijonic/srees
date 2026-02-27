@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Pole, CreatePoleRequest, UpdatePoleRequest, PoleSelectOption, ApiResponse } from '../models/pole.model';
+import { Pole, CreatePoleRequest, UpdatePoleRequest, PoleSelectOption, ApiResponse, PoleFilterRequest, PaginatedResponse } from '../models/pole.model';
 import { EntityCountStatistics } from '../models/statistics.model';
 
 @Injectable({
@@ -14,6 +14,27 @@ export class PoleService {
 
   getAll(): Observable<ApiResponse<Pole[]>> {
     return this.http.get<ApiResponse<Pole[]>>(this.apiUrl);
+  }
+
+  getFiltered(filterRequest: PoleFilterRequest): Observable<ApiResponse<PaginatedResponse<Pole[]>>> {
+    let params = new HttpParams()
+      .set('pageNumber', filterRequest.pageNumber.toString())
+      .set('pageSize', filterRequest.pageSize.toString());
+
+    if (filterRequest.searchTerm) {
+      params = params.set('searchTerm', filterRequest.searchTerm);
+    }
+    if (filterRequest.poleType !== undefined && filterRequest.poleType !== null) {
+      params = params.set('poleType', filterRequest.poleType.toString());
+    }
+    if (filterRequest.dateFrom) {
+      params = params.set('dateFrom', filterRequest.dateFrom);
+    }
+    if (filterRequest.dateTo) {
+      params = params.set('dateTo', filterRequest.dateTo);
+    }
+
+    return this.http.get<ApiResponse<PaginatedResponse<Pole[]>>>(`${this.apiUrl}/filtered`, { params });
   }
 
   getAllForSelect(): Observable<ApiResponse<PoleSelectOption[]>> {

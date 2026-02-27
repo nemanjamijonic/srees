@@ -20,6 +20,11 @@ namespace SREES.Services.Implementations
             return await _buildingService.GetAllBuildings();
         }
 
+        public async Task<ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>> GetBuildingsFiltered(BuildingFilterRequest filterRequest)
+        {
+            return await _buildingService.GetBuildingsFiltered(filterRequest);
+        }
+
         public async Task<ResponsePackage<List<BuildingSelectDataOut>>> GetAllBuildingsForSelect()
         {
             return await _buildingService.GetAllBuildingsForSelect();

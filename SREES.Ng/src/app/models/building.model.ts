@@ -35,6 +35,23 @@ export interface BuildingSelectOption {
   address: string;
 }
 
+export interface BuildingFilterRequest {
+  searchTerm?: string;
+  poleType?: number;
+  dateFrom?: string;
+  dateTo?: string;
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface PaginatedResponse<T> {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  data: T;
+}
+
 export interface ApiResponse<T> {
   message: string;
   data: T;

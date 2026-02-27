@@ -86,5 +86,12 @@ namespace SREES.API.Controllers
             var result = await _substationApplicationService.GetSubstationStatistics();
             return Ok(result);
         }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>>> GetSubstationsFiltered([FromQuery] SubstationFilterRequest filterRequest)
+        {
+            var result = await _substationApplicationService.GetSubstationsFiltered(filterRequest);
+            return Ok(result);
+        }
     }
 }

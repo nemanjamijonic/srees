@@ -49,5 +49,10 @@ namespace SREES.Services.Implementations
         {
             return await _regionService.GetRegionStatistics();
         }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<RegionDataOut>>>> GetRegionsFiltered(RegionFilterRequest filterRequest)
+        {
+            return await _regionService.GetRegionsFiltered(filterRequest);
+        }
     }
 }

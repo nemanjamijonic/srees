@@ -37,6 +37,30 @@ namespace SREES.BLL.Services.Implementation
             }
         }
 
+        public async Task<ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>> GetBuildingsFiltered(BuildingFilterRequest filterRequest)
+        {
+            try
+            {
+                var (buildings, totalCount) = await _uow.GetBuildingRepository().GetBuildingsFilteredAsync(filterRequest);
+                
+                var buildingList = _mapper.Map<List<BuildingDataOut>>(buildings.ToList());
+                var paginatedResponse = new PaginatedResponse<List<BuildingDataOut>>(
+                    buildingList, 
+                    totalCount, 
+                    filterRequest.PageNumber, 
+                    filterRequest.PageSize);
+
+                return new ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>(
+                    paginatedResponse, 
+                    "Buildings successfully retrieved");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving filtered buildings");
+                return new ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>(null, "Error retrieving buildings");
+            }
+        }
+
         public async Task<ResponsePackage<List<BuildingSelectDataOut>>> GetAllBuildingsForSelect()
         {
             try

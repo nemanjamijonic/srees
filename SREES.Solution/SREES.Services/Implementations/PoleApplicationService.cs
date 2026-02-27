@@ -49,5 +49,10 @@ namespace SREES.Services.Implementations
         {
             return await _poleService.GetPoleStatistics();
         }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<PoleDataOut>>>> GetPolesFiltered(PoleFilterRequest filterRequest)
+        {
+            return await _poleService.GetPolesFiltered(filterRequest);
+        }
     }
 }

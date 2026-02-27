@@ -182,5 +182,21 @@ namespace SREES.BLL.Services.Implementation
                 return new ResponsePackage<List<EntityCountStatisticsDataOut>>(null, "Greška pri preuzimanju statistike stubova");
             }
         }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<PoleDataOut>>>> GetPolesFiltered(PoleFilterRequest filterRequest)
+        {
+            try
+            {
+                var (poles, totalCount) = await _uow.GetPoleRepository().GetPolesFilteredAsync(filterRequest);
+                var poleList = _mapper.Map<List<PoleDataOut>>(poles.ToList());
+                var paginatedResponse = new PaginatedResponse<List<PoleDataOut>>(poleList, totalCount, filterRequest.PageNumber, filterRequest.PageSize);
+                return new ResponsePackage<PaginatedResponse<List<PoleDataOut>>>(paginatedResponse, "Stubovi uspešno filtrirani");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Greška pri filtriranju stubova");
+                return new ResponsePackage<PaginatedResponse<List<PoleDataOut>>>(null, "Greška pri filtriranju stubova");
+            }
+        }
     }
 }

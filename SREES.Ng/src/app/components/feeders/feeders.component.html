@@ -9,6 +9,81 @@
           </button>
         </div>
         <div class="card-body">
+          <!-- Filter Section -->
+          <div class="filter-section mb-4">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">
+                  <i class="fas fa-search"></i> Search
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="filterRequest.searchTerm"
+                  placeholder="Feeder name"
+                  (keyup.enter)="applyFilters()">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">
+                  <i class="fas fa-bolt"></i> Type
+                </label>
+                <select class="form-select" [(ngModel)]="filterRequest.feederType">
+                  <option [ngValue]="undefined">All Types</option>
+                  <option [ngValue]="0">Feeder 11kV</option>
+                  <option [ngValue]="1">Feeder 33kV</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">
+                  <i class="fas fa-calendar-alt"></i> Date From
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="filterRequest.dateFrom">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">
+                  <i class="fas fa-calendar-check"></i> Date To
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="filterRequest.dateTo">
+              </div>
+              <div class="col-md-3 d-flex align-items-end gap-2">
+                <button class="btn btn-primary flex-fill" (click)="applyFilters()">
+                  <i class="fas fa-filter me-1"></i>Filter
+                </button>
+                <button class="btn btn-outline-secondary flex-fill" (click)="resetFilters()">
+                  <i class="fas fa-times me-1"></i>Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Applied Filters Badges -->
+          <div class="applied-filters mb-3" *ngIf="appliedFilters.length > 0">
+            <span class="me-2 fw-bold">Active Filters:</span>
+            <span
+              *ngFor="let filter of appliedFilters"
+              class="badge bg-info me-2 filter-badge">
+              {{ filter.label }}: {{ filter.value }}
+              <i class="fas fa-times ms-1" (click)="removeFilter(filter.key)" style="cursor: pointer;"></i>
+            </span>
+          </div>
+
+          <!-- Results Info -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <p class="text-muted mb-0">
+                Showing {{ feeders.length > 0 ? ((currentPage - 1) * pageSize + 1) : 0 }}
+                to {{ Math.min(currentPage * pageSize, totalCount) }}
+                of {{ totalCount }} results
+              </p>
+            </div>
+          </div>
+
           <div class="table-responsive">
             <table class="table table-hover">
               <thead class="table-dark">
@@ -28,11 +103,7 @@
                   <td><strong>#{{ feeder.id }}</strong></td>
                   <td>{{ feeder.name || 'N/A' }}</td>
                   <td>
-                    <span class="badge" 
-                          [ngClass]="{
-                            'bg-feeder11': feeder.feederType === 0,
-                            'bg-feeder33': feeder.feederType === 1
-                          }">
+                    <span class="badge" [ngClass]="getFeederTypeClass(feeder.feederType)">
                       {{ getFeederTypeName(feeder.feederType) }}
                     </span>
                   </td>
@@ -53,6 +124,33 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-wrapper mt-3 d-flex justify-content-between align-items-center">
+            <div class="pagination-info">
+              Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalCount) }} of {{ totalCount }} entries
+            </div>
+            <nav>
+              <ul class="pagination mb-0">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <a class="page-link" (click)="previousPage()" style="cursor: pointer;">
+                    <i class="fas fa-chevron-left"></i>
+                  </a>
+                </li>
+                <li
+                  *ngFor="let page of pages"
+                  class="page-item"
+                  [class.active]="page === currentPage">
+                  <a class="page-link" (click)="goToPage(page)" style="cursor: pointer;">{{ page }}</a>
+                </li>
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <a class="page-link" (click)="nextPage()" style="cursor: pointer;">
+                    <i class="fas fa-chevron-right"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -93,9 +191,9 @@
             <label class="form-label">Supplied Regions (Optional):</label>
             <div class="region-checkboxes">
               <div class="form-check" *ngFor="let region of regionOptions">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
+                <input
+                  class="form-check-input"
+                  type="checkbox"
                   [id]="'region-' + region.id"
                   [checked]="isRegionSelected(region.id)"
                   (change)="toggleRegion(region.id)">
@@ -135,3 +233,4 @@
 </div>
 
 <div class="modal-backdrop fade" [class.show]="showModal || showDeleteModal" *ngIf="showModal || showDeleteModal"></div>
+

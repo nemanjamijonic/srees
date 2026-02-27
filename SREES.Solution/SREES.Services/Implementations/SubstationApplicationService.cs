@@ -52,5 +52,10 @@ namespace SREES.Services.Implementations
         {
             return await _substationService.GetSubstationStatistics();
         }
+
+        public async Task<ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>> GetSubstationsFiltered(SubstationFilterRequest filterRequest)
+        {
+            return await _substationService.GetSubstationsFiltered(filterRequest);
+        }
     }
 }

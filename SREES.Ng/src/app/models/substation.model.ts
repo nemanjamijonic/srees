@@ -28,3 +28,20 @@ export interface UpdateSubstationRequest {
   name: string;
   regionId: number;
 }
+
+export interface SubstationFilterRequest {
+  searchTerm?: string;
+  substationType?: number;
+  dateFrom?: string;
+  dateTo?: string;
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T;
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}

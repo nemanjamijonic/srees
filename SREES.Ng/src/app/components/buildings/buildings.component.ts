@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BuildingService } from '../../services/building.service';
 import { RegionService } from '../../services/region.service';
 import { PoleService } from '../../services/pole.service';
-import { Building, CreateBuildingRequest, UpdateBuildingRequest } from '../../models/building.model';
+import { Building, CreateBuildingRequest, UpdateBuildingRequest, BuildingFilterRequest, PaginatedResponse } from '../../models/building.model';
 import { RegionSelectOption } from '../../models/region-select.model';
 import { PoleSelectOption } from '../../models/pole.model';
 
@@ -23,6 +23,38 @@ export class BuildingsComponent implements OnInit {
   showDeleteModal = false;
   isEdit = false;
   selectedBuilding: Building | null = null;
+  
+  // Make Math available in template
+  Math = Math;
+  
+  // Pagination properties
+  totalCount = 0;
+  totalPages = 0;
+  currentPage = 1;
+  pageSize = 10;
+  pageSizes = [5, 10, 20, 50];
+  pages: number[] = [];
+  
+  // Filter properties
+  filterRequest: BuildingFilterRequest = {
+    searchTerm: '',
+    poleType: undefined,
+    dateFrom: '',
+    dateTo: '',
+    pageNumber: 1,
+    pageSize: 10
+  };
+
+  // Applied filters for display
+  appliedFilters: Array<{label: string, value: string, key: string}> = [];
+  
+  // Pole type options for filter
+  poleTypeOptions = [
+    { value: undefined, label: 'All Pole Types' },
+    { value: 0, label: 'HV Pole' },
+    { value: 1, label: 'MV Pole' },
+    { value: 2, label: 'LV Pole' }
+  ];
   
   buildingForm: CreateBuildingRequest = {
     latitude: 0,
@@ -46,8 +78,15 @@ export class BuildingsComponent implements OnInit {
   }
 
   loadBuildings() {
-    this.buildingService.getAll().subscribe(response => {
-      this.buildings = response.data;
+    this.filterRequest.pageNumber = this.currentPage;
+    this.filterRequest.pageSize = this.pageSize;
+    
+    this.buildingService.getFiltered(this.filterRequest).subscribe(response => {
+      this.buildings = response.data.data;
+      this.totalCount = response.data.totalCount;
+      this.totalPages = response.data.totalPages;
+      this.currentPage = response.data.currentPage;
+      this.updatePagination();
     });
   }
 
@@ -157,5 +196,121 @@ export class BuildingsComponent implements OnInit {
   getPoleAddress(poleId: number): string {
     const pole = this.poleOptions.find(p => p.id === poleId);
     return pole ? pole.name : 'N/A';
+  }
+
+  // Filter methods
+  applyFilters() {
+    this.currentPage = 1;
+    this.filterRequest.pageNumber = 1;
+    this.loadBuildings();
+    this.updateAppliedFilters();
+  }
+
+  resetFilters() {
+    this.filterRequest = {
+      searchTerm: '',
+      poleType: undefined,
+      dateFrom: '',
+      dateTo: '',
+      pageNumber: 1,
+      pageSize: this.pageSize
+    };
+    this.appliedFilters = [];
+    this.currentPage = 1;
+    this.loadBuildings();
+  }
+
+  removeFilter(key: string) {
+    switch(key) {
+      case 'searchTerm':
+        this.filterRequest.searchTerm = '';
+        break;
+      case 'poleType':
+        this.filterRequest.poleType = undefined;
+        break;
+      case 'dateFrom':
+        this.filterRequest.dateFrom = '';
+        break;
+      case 'dateTo':
+        this.filterRequest.dateTo = '';
+        break;
+    }
+    this.applyFilters();
+  }
+
+  updateAppliedFilters() {
+    this.appliedFilters = [];
+    
+    if (this.filterRequest.searchTerm) {
+      this.appliedFilters.push({
+        label: 'Search',
+        value: this.filterRequest.searchTerm,
+        key: 'searchTerm'
+      });
+    }
+
+    if (this.filterRequest.poleType !== undefined && this.filterRequest.poleType !== null) {
+      this.appliedFilters.push({
+        label: 'Pole Type',
+        value: this.getPoleTypeName(this.filterRequest.poleType),
+        key: 'poleType'
+      });
+    }
+
+    if (this.filterRequest.dateFrom) {
+      this.appliedFilters.push({
+        label: 'From',
+        value: new Date(this.filterRequest.dateFrom).toLocaleDateString(),
+        key: 'dateFrom'
+      });
+    }
+
+    if (this.filterRequest.dateTo) {
+      this.appliedFilters.push({
+        label: 'To',
+        value: new Date(this.filterRequest.dateTo).toLocaleDateString(),
+        key: 'dateTo'
+      });
+    }
+  }
+
+  // Pagination methods
+  updatePagination() {
+    this.pages = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      this.pages.push(i);
+    }
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
+      this.loadBuildings();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
+  }
+
+  onPageSizeChange() {
+    this.currentPage = 1;
+    this.loadBuildings();
   }
 }

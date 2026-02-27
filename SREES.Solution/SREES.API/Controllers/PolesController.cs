@@ -86,5 +86,12 @@ namespace SREES.API.Controllers
             var result = await _poleApplicationService.GetPoleStatistics();
             return Ok(result);
         }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<PoleDataOut>>>>> GetPolesFiltered([FromQuery] PoleFilterRequest filterRequest)
+        {
+            var result = await _poleApplicationService.GetPolesFiltered(filterRequest);
+            return Ok(result);
+        }
     }
 }

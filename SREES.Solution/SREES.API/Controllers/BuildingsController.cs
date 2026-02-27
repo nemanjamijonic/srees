@@ -26,6 +26,13 @@ namespace SREES.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("filtered")]
+        public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>>> GetBuildingsFiltered([FromQuery] BuildingFilterRequest filterRequest)
+        {
+            var result = await _buildingApplicationService.GetBuildingsFiltered(filterRequest);
+            return Ok(result);
+        }
+
         [HttpGet("select")]
         public async Task<ActionResult<ResponsePackage<List<BuildingSelectDataOut>>>> GetAllBuildingsForSelect()
         {

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RegionService } from '../../services/region.service';
-import { Region, CreateRegionRequest, UpdateRegionRequest } from '../../models/region.model';
+import { Region, CreateRegionRequest, UpdateRegionRequest, RegionFilterRequest } from '../../models/region.model';
 import { ApiResponse } from '../../models/region.model';
 
 @Component({
@@ -18,7 +18,23 @@ export class RegionsComponent implements OnInit {
   showDeleteModal = false;
   isEdit = false;
   selectedRegion: Region | null = null;
-  
+  Math = Math;
+
+  // Pagination state
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
+  totalPages = 0;
+  pages: number[] = [];
+
+  // Filter state
+  filterRequest: RegionFilterRequest = {
+    pageNumber: 1,
+    pageSize: 10
+  };
+
+  appliedFilters: { key: string; label: string; value: string }[] = [];
+
   regionForm: CreateRegionRequest = {
     name: '',
     latitude: 0,
@@ -28,13 +44,83 @@ export class RegionsComponent implements OnInit {
   constructor(private regionService: RegionService) {}
 
   ngOnInit() {
-    this.loadRegions();
+    this.loadRegionsFiltered();
   }
 
-  loadRegions() {
-    this.regionService.getAll().subscribe(response => {
-      this.regions = response.data;
+  loadRegionsFiltered() {
+    this.filterRequest.pageNumber = this.currentPage;
+    this.filterRequest.pageSize = this.pageSize;
+
+    this.regionService.getFiltered(this.filterRequest).subscribe(response => {
+      if (response.data) {
+        this.regions = response.data.data;
+        this.totalCount = response.data.totalCount;
+        this.totalPages = response.data.totalPages;
+        this.pages = this.generatePages();
+      }
     });
+  }
+
+  applyFilters() {
+    this.currentPage = 1;
+    this.updateAppliedFilters();
+    this.loadRegionsFiltered();
+  }
+
+  resetFilters() {
+    this.filterRequest = { pageNumber: 1, pageSize: this.pageSize };
+    this.appliedFilters = [];
+    this.currentPage = 1;
+    this.loadRegionsFiltered();
+  }
+
+  removeFilter(key: string) {
+    switch (key) {
+      case 'searchTerm': this.filterRequest.searchTerm = undefined; break;
+      case 'dateFrom': this.filterRequest.dateFrom = undefined; break;
+      case 'dateTo': this.filterRequest.dateTo = undefined; break;
+    }
+    this.applyFilters();
+  }
+
+  updateAppliedFilters() {
+    this.appliedFilters = [];
+    if (this.filterRequest.searchTerm)
+      this.appliedFilters.push({ key: 'searchTerm', label: 'Search', value: this.filterRequest.searchTerm });
+    if (this.filterRequest.dateFrom)
+      this.appliedFilters.push({ key: 'dateFrom', label: 'From', value: this.filterRequest.dateFrom });
+    if (this.filterRequest.dateTo)
+      this.appliedFilters.push({ key: 'dateTo', label: 'To', value: this.filterRequest.dateTo });
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadRegionsFiltered();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadRegionsFiltered();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadRegionsFiltered();
+    }
+  }
+
+  generatePages(): number[] {
+    const pages: number[] = [];
+    const delta = 2;
+    const start = Math.max(1, this.currentPage - delta);
+    const end = Math.min(this.totalPages, this.currentPage + delta);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   }
 
   openCreateModal() {
@@ -68,12 +154,12 @@ export class RegionsComponent implements OnInit {
   saveRegion() {
     if (this.isEdit && this.selectedRegion) {
       this.regionService.update(this.selectedRegion.id, this.regionForm).subscribe(() => {
-        this.loadRegions();
+        this.loadRegionsFiltered();
         this.closeModal();
       });
     } else {
       this.regionService.create(this.regionForm).subscribe(() => {
-        this.loadRegions();
+        this.loadRegionsFiltered();
         this.closeModal();
       });
     }
@@ -82,9 +168,10 @@ export class RegionsComponent implements OnInit {
   deleteRegion() {
     if (this.selectedRegion) {
       this.regionService.delete(this.selectedRegion.id).subscribe(() => {
-        this.loadRegions();
+        this.loadRegionsFiltered();
         this.closeModal();
       });
     }
   }
 }
+

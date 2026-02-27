@@ -7,6 +7,7 @@ namespace SREES.BLL.Services.Interfaces
     public interface IFeederService
     {
         Task<ResponsePackage<List<FeederDataOut>>> GetAllFeeders();
+        Task<ResponsePackage<PaginatedResponse<List<FeederDataOut>>>> GetFeedersFiltered(FeederFilterRequest filterRequest);
         Task<ResponsePackage<List<FeederSelectDataOut>>> GetAllFeedersForSelect();
         Task<ResponsePackage<FeederDataOut?>> GetFeederById(int id);
         Task<ResponsePackage<FeederDataOut?>> CreateFeeder(FeederDataIn feederDataIn);

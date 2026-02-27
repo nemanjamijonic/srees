@@ -7,6 +7,7 @@ namespace SREES.BLL.Services.Interfaces
     public interface IBuildingService
     {
         Task<ResponsePackage<List<BuildingDataOut>>> GetAllBuildings();
+        Task<ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>> GetBuildingsFiltered(BuildingFilterRequest filterRequest);
         Task<ResponsePackage<List<BuildingSelectDataOut>>> GetAllBuildingsForSelect();
         Task<ResponsePackage<BuildingDataOut?>> GetBuildingById(int id);
         Task<ResponsePackage<BuildingDataOut?>> CreateBuilding(BuildingDataIn buildingDataIn);

@@ -13,5 +13,6 @@ namespace SREES.BLL.Services.Interfaces
         Task<ResponsePackage<RegionDataOut?>> UpdateRegion(int id, RegionDataIn regionDataIn);
         Task<ResponsePackage<string>> DeleteRegion(int id);
         Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetRegionStatistics();
+        Task<ResponsePackage<PaginatedResponse<List<RegionDataOut>>>> GetRegionsFiltered(RegionFilterRequest filterRequest);
     }
 }

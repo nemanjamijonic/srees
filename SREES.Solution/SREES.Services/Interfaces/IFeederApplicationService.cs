@@ -7,6 +7,7 @@ namespace SREES.Services.Interfaces
     public interface IFeederApplicationService
     {
         Task<ResponsePackage<List<FeederDataOut>>> GetAllFeeders();
+        Task<ResponsePackage<PaginatedResponse<List<FeederDataOut>>>> GetFeedersFiltered(FeederFilterRequest filterRequest);
         Task<ResponsePackage<List<FeederSelectDataOut>>> GetAllFeedersForSelect();
         Task<ResponsePackage<FeederDataOut?>> GetFeederById(int id);
         Task<ResponsePackage<FeederDataOut?>> CreateFeeder(FeederDataIn feederDataIn);

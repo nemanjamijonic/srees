@@ -86,5 +86,12 @@ namespace SREES.API.Controllers
             var result = await _regionApplicationService.GetRegionStatistics();
             return Ok(result);
         }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<RegionDataOut>>>>> GetRegionsFiltered([FromQuery] RegionFilterRequest filterRequest)
+        {
+            var result = await _regionApplicationService.GetRegionsFiltered(filterRequest);
+            return Ok(result);
+        }
     }
 }

@@ -20,6 +20,11 @@ namespace SREES.Services.Implementations
             return await _feederService.GetAllFeeders();
         }
 
+        public async Task<ResponsePackage<PaginatedResponse<List<FeederDataOut>>>> GetFeedersFiltered(FeederFilterRequest filterRequest)
+        {
+            return await _feederService.GetFeedersFiltered(filterRequest);
+        }
+
         public async Task<ResponsePackage<List<FeederSelectDataOut>>> GetAllFeedersForSelect()
         {
             return await _feederService.GetAllFeedersForSelect();

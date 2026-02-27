@@ -13,5 +13,6 @@ namespace SREES.Services.Interfaces
         Task<ResponsePackage<SubstationDataOut?>> UpdateSubstation(int id, SubstationDataIn substationDataIn);
         Task<ResponsePackage<string>> DeleteSubstation(int id);
         Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetSubstationStatistics();
+        Task<ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>> GetSubstationsFiltered(SubstationFilterRequest filterRequest);
     }
 }
