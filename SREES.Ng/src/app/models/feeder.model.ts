@@ -4,6 +4,8 @@ export interface Feeder {
   feederType: number;
   substationId: number | null;
   suppliedRegions: number[] | null;
+  latitude: number | null;
+  longitude: number | null;
   createdAt: string;
   lastUpdateTime: string;
   guid: string;
@@ -14,6 +16,8 @@ export interface CreateFeederRequest {
   feederType: number;
   substationId: number | null;
   suppliedRegions: number[] | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface UpdateFeederRequest {
@@ -21,6 +25,8 @@ export interface UpdateFeederRequest {
   feederType: number;
   substationId: number | null;
   suppliedRegions: number[] | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface FeederSelectOption {

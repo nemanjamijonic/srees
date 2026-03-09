@@ -9,6 +9,8 @@ namespace SREES.DAL.Models
         public FeederType FeederType { get; set; }
         public int? SubstationId { get; set; }
         public Substation? Substation { get; set; }
-        public List<int>? SuppliedRegions { get; set; } 
+        public List<int>? SuppliedRegions { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

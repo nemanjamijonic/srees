@@ -93,6 +93,8 @@
                   <th>Type</th>
                   <th>Substation</th>
                   <th>Supplied Regions</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
                   <th>Created</th>
                   <th>Updated At</th>
                   <th class="text-center">Actions</th>
@@ -109,6 +111,8 @@
                   </td>
                   <td><span class="badge bg-info">{{ getSubstationName(feeder.substationId) }}</span></td>
                   <td><span class="badge bg-success">{{ getSuppliedRegionsNames(feeder.suppliedRegions) }}</span></td>
+                  <td>{{ feeder.latitude !== null && feeder.latitude !== undefined ? feeder.latitude : 'N/A' }}</td>
+                  <td>{{ feeder.longitude !== null && feeder.longitude !== undefined ? feeder.longitude : 'N/A' }}</td>
                   <td>{{ feeder.createdAt | date:'short' }}</td>
                   <td>{{ feeder.lastUpdateTime | date:'short' }}</td>
                   <td class="text-center">
@@ -201,6 +205,16 @@
                   {{ region.name }}
                 </label>
               </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Latitude (Optional):</label>
+              <input type="number" class="form-control" [(ngModel)]="feederForm.latitude" name="latitude" placeholder="e.g. 44.8176" step="any">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Longitude (Optional):</label>
+              <input type="number" class="form-control" [(ngModel)]="feederForm.longitude" name="longitude" placeholder="e.g. 20.4569" step="any">
             </div>
           </div>
         </div>

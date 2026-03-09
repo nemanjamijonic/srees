@@ -44,7 +44,9 @@ export class FeedersComponent implements OnInit {
     name: '',
     feederType: -1,
     substationId: null,
-    suppliedRegions: []
+    suppliedRegions: [],
+    latitude: null,
+    longitude: null
   };
 
   constructor(
@@ -149,7 +151,9 @@ export class FeedersComponent implements OnInit {
       name: '',
       feederType: -1,
       substationId: null,
-      suppliedRegions: []
+      suppliedRegions: [],
+      latitude: null,
+      longitude: null
     };
     this.showModal = true;
   }
@@ -161,7 +165,9 @@ export class FeedersComponent implements OnInit {
       name: feeder.name,
       feederType: feeder.feederType,
       substationId: feeder.substationId,
-      suppliedRegions: feeder.suppliedRegions || []
+      suppliedRegions: feeder.suppliedRegions || [],
+      latitude: feeder.latitude,
+      longitude: feeder.longitude
     };
     this.showModal = true;
   }
@@ -191,7 +197,9 @@ export class FeedersComponent implements OnInit {
       substationId: this.feederForm.substationId || null,
       suppliedRegions: this.feederForm.suppliedRegions && this.feederForm.suppliedRegions.length > 0
         ? this.feederForm.suppliedRegions
-        : null
+        : null,
+      latitude: this.feederForm.latitude !== undefined ? this.feederForm.latitude : null,
+      longitude: this.feederForm.longitude !== undefined ? this.feederForm.longitude : null
     };
 
     if (this.isEdit && this.selectedFeeder) {

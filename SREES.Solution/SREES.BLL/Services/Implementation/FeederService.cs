@@ -111,7 +111,9 @@ namespace SREES.BLL.Services.Implementation
                     Name = feederDataIn.Name,
                     FeederType = feederDataIn.FeederType,
                     SubstationId = feederDataIn.SubstationId,
-                    SuppliedRegions = feederDataIn.SuppliedRegions
+                    SuppliedRegions = feederDataIn.SuppliedRegions,
+                    Latitude = feederDataIn.Latitude,
+                    Longitude = feederDataIn.Longitude
                 };
 
                 await _uow.GetFeederRepository().AddAsync(feeder);
@@ -147,6 +149,8 @@ namespace SREES.BLL.Services.Implementation
                 feeder.FeederType = feederDataIn.FeederType;
                 feeder.SubstationId = feederDataIn.SubstationId;
                 feeder.SuppliedRegions = feederDataIn.SuppliedRegions;
+                feeder.Latitude = feederDataIn.Latitude;
+                feeder.Longitude = feederDataIn.Longitude;
                 feeder.LastUpdateTime = DateTime.Now;
 
                 await _uow.CompleteAsync();

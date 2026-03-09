@@ -68,7 +68,7 @@ namespace SREES.Common.Repositories.Implementations
             {
                 entities = entities.Where(e => !e.IsDeleted);
             }
-            return await entities.FirstOrDefaultAsync();
+            return await entities.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public void RemoveEntity(TEntity entity)
