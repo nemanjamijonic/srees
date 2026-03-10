@@ -46,8 +46,47 @@
         <span></span>
       </button>
       <h1>SREES Application</h1>
-      <div class="user-info">
-        <span>{{ username }}</span>
+      <div class="header-actions">
+        <!-- Notification Bell -->
+        <div class="notification-wrapper">
+          <button class="notification-btn" (click)="toggleNotifications()" [class.connected]="isSignalRConnected">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+            <span class="connection-indicator" [class.connected]="isSignalRConnected"></span>
+          </button>
+          
+          <!-- Notification Dropdown -->
+          <div class="notification-dropdown" *ngIf="isNotificationOpen">
+            <div class="notification-header">
+              <h4>Notifications</h4>
+              <button class="mark-all-btn" (click)="markAllAsRead()" *ngIf="unreadCount > 0">Mark all read</button>
+            </div>
+            <div class="notification-list">
+              <div 
+                class="notification-item" 
+                *ngFor="let notification of notifications"
+                [class.unread]="!notification.isRead"
+                (click)="markAsRead(notification)">
+                <span class="notification-icon">{{ getNotificationIcon(notification.notificationType) }}</span>
+                <div class="notification-content">
+                  <strong>{{ notification.title }}</strong>
+                  <p>{{ notification.message }}</p>
+                  <small>{{ getTimeAgo(notification.createdAt) }}</small>
+                </div>
+              </div>
+              <div class="no-notifications" *ngIf="notifications.length === 0">
+                No notifications
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="user-info">
+          <span>{{ username }}</span>
+        </div>
       </div>
     </header>
 

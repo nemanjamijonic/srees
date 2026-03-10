@@ -14,12 +14,18 @@ namespace SREES.BLL.Services.Implementation
         private readonly ILogger<NotificationService> _logger;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly IRealTimeNotificationService? _realTimeService;
 
-        public NotificationService(ILogger<NotificationService> logger, IUnitOfWork uow, IMapper mapper)
+        public NotificationService(
+            ILogger<NotificationService> logger,
+            IUnitOfWork uow,
+            IMapper mapper,
+            IRealTimeNotificationService? realTimeService = null)
         {
             _logger = logger;
             _uow = uow;
             _mapper = mapper;
+            _realTimeService = realTimeService;
         }
 
         public async Task<ResponsePackage<List<NotificationDataOut>>> GetNotificationsByUserId(int userId)
@@ -28,12 +34,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var notifications = await _uow.GetNotificationRepository().GetNotificationsByUserIdAsync(userId);
                 var notificationList = _mapper.Map<List<NotificationDataOut>>(notifications.ToList());
-                return new ResponsePackage<List<NotificationDataOut>>(notificationList, "Obaveötenja uspeöno preuzeta");
+                return new ResponsePackage<List<NotificationDataOut>>(notificationList, "ObaveÔøΩtenja uspeÔøΩno preuzeta");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri preuzimanju obaveötenja za korisnika {UserId}", userId);
-                return new ResponsePackage<List<NotificationDataOut>>(null, "Greöka pri preuzimanju obaveötenja");
+                _logger.LogError(ex, "GreÔøΩka pri preuzimanju obaveÔøΩtenja za korisnika {UserId}", userId);
+                return new ResponsePackage<List<NotificationDataOut>>(null, "GreÔøΩka pri preuzimanju obaveÔøΩtenja");
             }
         }
 
@@ -43,12 +49,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 var notifications = await _uow.GetNotificationRepository().GetUnreadNotificationsByUserIdAsync(userId);
                 var notificationList = _mapper.Map<List<NotificationDataOut>>(notifications.ToList());
-                return new ResponsePackage<List<NotificationDataOut>>(notificationList, "Nepro?itana obaveötenja uspeöno preuzeta");
+                return new ResponsePackage<List<NotificationDataOut>>(notificationList, "Nepro?itana obaveÔøΩtenja uspeÔøΩno preuzeta");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri preuzimanju nepro?itanih obaveötenja za korisnika {UserId}", userId);
-                return new ResponsePackage<List<NotificationDataOut>>(null, "Greöka pri preuzimanju nepro?itanih obaveötenja");
+                _logger.LogError(ex, "GreÔøΩka pri preuzimanju nepro?itanih obaveÔøΩtenja za korisnika {UserId}", userId);
+                return new ResponsePackage<List<NotificationDataOut>>(null, "GreÔøΩka pri preuzimanju nepro?itanih obaveÔøΩtenja");
             }
         }
 
@@ -57,12 +63,12 @@ namespace SREES.BLL.Services.Implementation
             try
             {
                 var count = await _uow.GetNotificationRepository().GetUnreadCountByUserIdAsync(userId);
-                return new ResponsePackage<int>(count, "Broj nepro?itanih obaveötenja uspeöno preuzet");
+                return new ResponsePackage<int>(count, "Broj nepro?itanih obaveÔøΩtenja uspeÔøΩno preuzet");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri preuzimanju broja nepro?itanih obaveötenja za korisnika {UserId}", userId);
-                return new ResponsePackage<int>(0, "Greöka pri preuzimanju broja nepro?itanih obaveötenja");
+                _logger.LogError(ex, "GreÔøΩka pri preuzimanju broja nepro?itanih obaveÔøΩtenja za korisnika {UserId}", userId);
+                return new ResponsePackage<int>(0, "GreÔøΩka pri preuzimanju broja nepro?itanih obaveÔøΩtenja");
             }
         }
 
@@ -88,12 +94,37 @@ namespace SREES.BLL.Services.Implementation
                 await _uow.CompleteAsync();
 
                 var notificationDataOut = _mapper.Map<NotificationDataOut>(notification);
-                return new ResponsePackage<NotificationDataOut?>(notificationDataOut, "Obaveötenje uspeöno kreirano");
+
+                // ≈†alji real-time notifikaciju preko SignalR
+                if (_realTimeService != null)
+                {
+                    try
+                    {
+                        _logger.LogInformation("≈†aljem real-time notifikaciju korisniku {UserId}...", notificationDataIn.UserId);
+                        await _realTimeService.SendToUserAsync(notificationDataIn.UserId, notificationDataOut);
+                        _logger.LogInformation("Real-time notifikacija uspe≈°no poslata korisniku {UserId}", notificationDataIn.UserId);
+                        
+                        // A≈æuriraj broj neproƒçitanih
+                        var unreadCount = await _uow.GetNotificationRepository().GetUnreadCountByUserIdAsync(notificationDataIn.UserId);
+                        await _realTimeService.UpdateUnreadCountAsync(notificationDataIn.UserId, unreadCount);
+                        _logger.LogInformation("A≈æuriran unread count za korisnika {UserId}: {Count}", notificationDataIn.UserId, unreadCount);
+                    }
+                    catch (Exception rtEx)
+                    {
+                        _logger.LogWarning(rtEx, "Neuspe≈°no slanje real-time notifikacije korisniku {UserId}", notificationDataIn.UserId);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("IRealTimeNotificationService nije dostupan - notifikacija neƒáe biti poslata u realnom vremenu");
+                }
+
+                return new ResponsePackage<NotificationDataOut?>(notificationDataOut, "ObaveÔøΩtenje uspeÔøΩno kreirano");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri kreiranju obaveötenja");
-                return new ResponsePackage<NotificationDataOut?>(null, "Greöka pri kreiranju obaveötenja");
+                _logger.LogError(ex, "GreÔøΩka pri kreiranju obaveÔøΩtenja");
+                return new ResponsePackage<NotificationDataOut?>(null, "GreÔøΩka pri kreiranju obaveÔøΩtenja");
             }
         }
 
@@ -103,12 +134,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 await _uow.GetNotificationRepository().MarkAsReadAsync(notificationId);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<bool>(true, "Obaveötenje ozna?eno kao pro?itano");
+                return new ResponsePackage<bool>(true, "ObaveÔøΩtenje ozna?eno kao pro?itano");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri ozna?avanju obaveötenja {NotificationId} kao pro?itanog", notificationId);
-                return new ResponsePackage<bool>(false, "Greöka pri ozna?avanju obaveötenja kao pro?itanog");
+                _logger.LogError(ex, "GreÔøΩka pri ozna?avanju obaveÔøΩtenja {NotificationId} kao pro?itanog", notificationId);
+                return new ResponsePackage<bool>(false, "GreÔøΩka pri ozna?avanju obaveÔøΩtenja kao pro?itanog");
             }
         }
 
@@ -118,12 +149,12 @@ namespace SREES.BLL.Services.Implementation
             {
                 await _uow.GetNotificationRepository().MarkAllAsReadByUserIdAsync(userId);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<bool>(true, "Sva obaveötenja ozna?ena kao pro?itana");
+                return new ResponsePackage<bool>(true, "Sva obaveÔøΩtenja ozna?ena kao pro?itana");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri ozna?avanju svih obaveötenja kao pro?itanih za korisnika {UserId}", userId);
-                return new ResponsePackage<bool>(false, "Greöka pri ozna?avanju svih obaveötenja kao pro?itanih");
+                _logger.LogError(ex, "GreÔøΩka pri ozna?avanju svih obaveÔøΩtenja kao pro?itanih za korisnika {UserId}", userId);
+                return new ResponsePackage<bool>(false, "GreÔøΩka pri ozna?avanju svih obaveÔøΩtenja kao pro?itanih");
             }
         }
 
@@ -135,18 +166,18 @@ namespace SREES.BLL.Services.Implementation
                 if (outage == null)
                     return new ResponsePackage<NotificationDataOut?>(null, "Kvar nije prona?en");
 
-                var notificationType = newStatus == "Resolved" 
-                    ? NotificationType.OutageResolved 
+                var notificationType = newStatus == "Resolved"
+                    ? NotificationType.OutageResolved
                     : NotificationType.OutageStatusChanged;
 
                 var title = newStatus == "Resolved"
-                    ? "Kvar je reöen"
+                    ? "Kvar je reÔøΩen"
                     : "Promena statusa kvara";
 
                 var message = $"Status kvara #{outageId} je promenjen sa '{oldStatus}' na '{newStatus}'.";
                 if (newStatus == "Resolved")
                 {
-                    message = $"Kvar #{outageId} je uspeöno reöen. Hvala na strpljenju.";
+                    message = $"Kvar #{outageId} je uspeÔøΩno reÔøΩen. Hvala na strpljenju.";
                 }
 
                 var notificationDataIn = new NotificationDataIn
@@ -162,8 +193,8 @@ namespace SREES.BLL.Services.Implementation
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri kreiranju obaveötenja o promeni statusa kvara {OutageId}", outageId);
-                return new ResponsePackage<NotificationDataOut?>(null, "Greöka pri kreiranju obaveötenja o promeni statusa kvara");
+                _logger.LogError(ex, "GreÔøΩka pri kreiranju obaveÔøΩtenja o promeni statusa kvara {OutageId}", outageId);
+                return new ResponsePackage<NotificationDataOut?>(null, "GreÔøΩka pri kreiranju obaveÔøΩtenja o promeni statusa kvara");
             }
         }
 
@@ -187,7 +218,7 @@ namespace SREES.BLL.Services.Implementation
                     {
                         UserId = userId,
                         OutageId = outageId,
-                        Title = "Obaveötenje o kvaru u vaöem regionu",
+                        Title = "ObaveÔøΩtenje o kvaru u vaÔøΩem regionu",
                         Message = message,
                         NotificationType = NotificationType.SystemAlert
                     };
@@ -196,12 +227,12 @@ namespace SREES.BLL.Services.Implementation
                     notificationCount++;
                 }
 
-                return new ResponsePackage<int>(notificationCount, $"Poslato {notificationCount} obaveötenja korisnicima u regionu");
+                return new ResponsePackage<int>(notificationCount, $"Poslato {notificationCount} obaveÔøΩtenja korisnicima u regionu");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri slanju obaveötenja korisnicima u regionu {RegionId}", regionId);
-                return new ResponsePackage<int>(0, "Greöka pri slanju obaveötenja korisnicima u regionu");
+                _logger.LogError(ex, "GreÔøΩka pri slanju obaveÔøΩtenja korisnicima u regionu {RegionId}", regionId);
+                return new ResponsePackage<int>(0, "GreÔøΩka pri slanju obaveÔøΩtenja korisnicima u regionu");
             }
         }
 
@@ -211,16 +242,16 @@ namespace SREES.BLL.Services.Implementation
             {
                 var notification = await _uow.GetNotificationRepository().GetByIdAsync(notificationId);
                 if (notification == null)
-                    return new ResponsePackage<string>(null, "Obaveötenje nije prona?eno");
+                    return new ResponsePackage<string>(null, "ObaveÔøΩtenje nije prona?eno");
 
                 _uow.GetNotificationRepository().RemoveEntity(notification);
                 await _uow.CompleteAsync();
-                return new ResponsePackage<string>("Obaveötenje uspeöno obrisano", "Obaveötenje uspeöno obrisano");
+                return new ResponsePackage<string>("ObaveÔøΩtenje uspeÔøΩno obrisano", "ObaveÔøΩtenje uspeÔøΩno obrisano");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Greöka pri brisanju obaveötenja {NotificationId}", notificationId);
-                return new ResponsePackage<string>(null, "Greöka pri brisanju obaveötenja");
+                _logger.LogError(ex, "GreÔøΩka pri brisanju obaveÔøΩtenja {NotificationId}", notificationId);
+                return new ResponsePackage<string>(null, "GreÔøΩka pri brisanju obaveÔøΩtenja");
             }
         }
     }

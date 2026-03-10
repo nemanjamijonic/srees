@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using SREES.API.Hubs;
 using SREES.BLL.Mappings;
 using SREES.BLL.Services.Implementation;
 using SREES.BLL.Services.Interfaces;
@@ -23,7 +24,7 @@ namespace SREES.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // CORS policy za Angular frontend
+            // CORS policy za Angular frontend i SignalR
             const string corsPolicyName = "AllowAngularApp";
             builder.Services.AddCors(options =>
             {
@@ -43,6 +44,12 @@ namespace SREES.API
             });
 
             builder.Services.AddControllers();
+            
+            // SignalR
+            builder.Services.AddSignalR();
+            builder.Services.AddScoped<INotificationHubService, NotificationHubService>();
+            builder.Services.AddScoped<IRealTimeNotificationService, SignalRNotificationService>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -54,11 +61,28 @@ namespace SREES.API
                 }
             ));
 
-            // JWT Authentication
+            // JWT Authentication sa podrškom za SignalR
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = JwtManager.GetTokenValidationParameters();
+                    
+                    // Podrška za SignalR - token iz query stringa
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            
+                            // Ako je zahtev za SignalR hub, uzmi token iz query stringa
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             builder.Services.AddAuthorization();
@@ -100,6 +124,9 @@ namespace SREES.API
 
 
             app.MapControllers();
+            
+            // SignalR Hub endpoint
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.Run();
         }

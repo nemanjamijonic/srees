@@ -35,4 +35,18 @@ export class OutageService {
   getStatistics(): Observable<ApiResponse<EntityCountStatistics[]>> {
     return this.http.get<ApiResponse<EntityCountStatistics[]>>(`${this.baseUrl}/statistics`);
   }
+
+  /**
+   * Get outages by feeder ID
+   */
+  getByFeederId(feederId: number): Observable<ApiResponse<Outage[]>> {
+    return this.http.get<ApiResponse<Outage[]>>(`${this.baseUrl}/by-feeder/${feederId}`);
+  }
+
+  /**
+   * Get outages by substation ID
+   */
+  getBySubstationId(substationId: number): Observable<ApiResponse<Outage[]>> {
+    return this.http.get<ApiResponse<Outage[]>>(`${this.baseUrl}/by-substation/${substationId}`);
+  }
 }
