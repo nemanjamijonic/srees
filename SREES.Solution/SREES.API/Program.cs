@@ -9,6 +9,7 @@ using SREES.Common.Services.Interfaces;
 using SREES.DAL.Context;
 using SREES.DAL.Repository.Implementations;
 using SREES.DAL.Repository.Interfaces;
+using SREES.DAL.Seed;
 using SREES.DAL.UOW.Implementations;
 using SREES.DAL.UOW.Interafaces;
 using SREES.Services.Implementations;
@@ -18,7 +19,7 @@ namespace SREES.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +64,7 @@ namespace SREES.API
             builder.Services.AddAuthorization();
 
             // AutoMapper - Dodaj sve profile
-            builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile), typeof(BuildingProfile), typeof(FeederProfile), typeof(CustomerProfile));
+            builder.Services.AddAutoMapper(typeof(OutageProfile), typeof(UserProfile), typeof(RegionProfile), typeof(SubstationProfile), typeof(PoleProfile), typeof(BuildingProfile), typeof(FeederProfile), typeof(CustomerProfile), typeof(NotificationProfile));
 
             builder.Services.AddScoped<ICachingService, CachingService>();
             RegisterRepositories(builder);
@@ -74,6 +75,12 @@ namespace SREES.API
 
             // Izvršavanje migracija na pokretanju aplikacije
             MigrateDatabase(app);
+
+            // Seed podataka (samo u Development okruženju)
+            if (app.Environment.IsDevelopment())
+            {
+                await SeedDatabaseAsync(app);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -107,6 +114,7 @@ namespace SREES.API
             builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
             builder.Services.AddScoped<IFeederRepository, FeederRepository>();
             builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
         }
 
         private static void RegisterBllServices(WebApplicationBuilder builder)
@@ -114,6 +122,8 @@ namespace SREES.API
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IOutageService, OutageService>();
+            builder.Services.AddScoped<IOutageDetectionService, OutageDetectionService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IRegionService, RegionService>();
             builder.Services.AddScoped<ISubstationService, SubstationService>();
             builder.Services.AddScoped<IPoleService, PoleService>();
@@ -132,6 +142,7 @@ namespace SREES.API
             builder.Services.AddScoped<IBuildingApplicationService, BuildingApplicationService>();
             builder.Services.AddScoped<IFeederApplicationService, FeederApplicationService>();
             builder.Services.AddScoped<ICustomerApplicationService, CustomerApplicationService>();
+            builder.Services.AddScoped<INotificationApplicationService, NotificationApplicationService>();
         }
 
         private static void MigrateDatabase(WebApplication app)
@@ -150,6 +161,20 @@ namespace SREES.API
                     logger.LogError(ex, "Greška pri izvršavanju migracija baze podataka");
                     throw;
                 }
+            }
+        }
+
+        private static async Task SeedDatabaseAsync(WebApplication app)
+        {
+            try
+            {
+                await DatabaseSeeder.SeedAsync(app.Services);
+            }
+            catch (Exception ex)
+            {
+                var logger = app.Services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "Greška pri seed-ovanju baze podataka");
+                // Ne prekidamo aplikaciju ako seed ne uspe
             }
         }
     }

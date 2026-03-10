@@ -17,6 +17,7 @@ namespace SREES.DAL.UOW.Implementations
         private IBuildingRepository? BuildingRepository;
         private IFeederRepository? FeederRepository;
         private ICustomerRepository? CustomerRepository;
+        private INotificationRepository? NotificationRepository;
 
         public UnitOfWork(SreesContext context)
         {
@@ -79,6 +80,11 @@ namespace SREES.DAL.UOW.Implementations
         public ICustomerRepository GetCustomerRepository()
         {
             return CustomerRepository ??= new CustomerRepository(_context!);
+        }
+
+        public INotificationRepository GetNotificationRepository()
+        {
+            return NotificationRepository ??= new NotificationRepository(_context!);
         }
 
         protected virtual async ValueTask DisposeAsyncCore()

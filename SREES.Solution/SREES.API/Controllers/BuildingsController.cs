@@ -7,9 +7,13 @@ using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
 {
+    /// <summary>
+    /// Kontroler za upravljanje zgradama/objektima
+    /// GET: Dostupno svima (Gost, User, Admin)
+    /// POST/PUT/DELETE: Samo Admin
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class BuildingsController : ControllerBase
     {
         private readonly IBuildingApplicationService _buildingApplicationService;
@@ -20,6 +24,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<BuildingDataOut>>>> GetAllBuildings()
         {
             var result = await _buildingApplicationService.GetAllBuildings();
@@ -27,6 +32,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("filtered")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<BuildingDataOut>>>>> GetBuildingsFiltered([FromQuery] BuildingFilterRequest filterRequest)
         {
             var result = await _buildingApplicationService.GetBuildingsFiltered(filterRequest);
@@ -34,6 +40,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("select")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<BuildingSelectDataOut>>>> GetAllBuildingsForSelect()
         {
             var result = await _buildingApplicationService.GetAllBuildingsForSelect();
@@ -41,6 +48,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<BuildingDataOut?>>> GetBuildingById(int id)
         {
             var result = await _buildingApplicationService.GetBuildingById(id);
@@ -51,6 +59,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<BuildingDataOut?>>> CreateBuilding([FromBody] BuildingDataIn buildingDataIn)
         {
             if (!ModelState.IsValid)
@@ -64,6 +73,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<BuildingDataOut?>>> UpdateBuilding(int id, [FromBody] BuildingDataIn buildingDataIn)
         {
             if (!ModelState.IsValid)
@@ -77,6 +87,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<string>>> DeleteBuilding(int id)
         {
             var result = await _buildingApplicationService.DeleteBuilding(id);

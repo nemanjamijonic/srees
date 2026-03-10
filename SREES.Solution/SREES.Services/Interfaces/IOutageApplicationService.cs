@@ -12,5 +12,7 @@ namespace SREES.Services.Interfaces
         Task<ResponsePackage<OutageDataOut?>> UpdateOutageStatus(int id, OutageStatusUpdateDataIn statusUpdate);
         Task<ResponsePackage<string>> DeleteOutage(int id);
         Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetOutageStatistics();
+        Task<ResponsePackage<List<OutageDataOut>>> GetOutagesByFeederId(int feederId);
+        Task<ResponsePackage<List<OutageDataOut>>> GetOutagesBySubstationId(int substationId);
     }
 }

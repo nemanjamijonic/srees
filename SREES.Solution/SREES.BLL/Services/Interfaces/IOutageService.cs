@@ -12,5 +12,15 @@ namespace SREES.BLL.Services.Interfaces
         Task<ResponsePackage<OutageDataOut?>> UpdateOutageStatus(int id, OutageStatusUpdateDataIn statusUpdate);
         Task<ResponsePackage<string>> DeleteOutage(int id);
         Task<ResponsePackage<List<EntityCountStatisticsDataOut>>> GetOutageStatistics();
+        
+        /// <summary>
+        /// Preuzima istoriju kvarova za odre?eni Feeder
+        /// </summary>
+        Task<ResponsePackage<List<OutageDataOut>>> GetOutagesByFeederId(int feederId);
+        
+        /// <summary>
+        /// Preuzima istoriju kvarova za odre?enu Substation
+        /// </summary>
+        Task<ResponsePackage<List<OutageDataOut>>> GetOutagesBySubstationId(int substationId);
     }
 }

@@ -7,9 +7,13 @@ using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
 {
+    /// <summary>
+    /// Kontroler za upravljanje regionima
+    /// GET: Dostupno svima (Gost, User, Admin)
+    /// POST/PUT/DELETE: Samo Admin
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly IRegionApplicationService _regionApplicationService;
@@ -20,6 +24,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<RegionDataOut>>>> GetAllRegions()
         {
             var result = await _regionApplicationService.GetAllRegions();
@@ -27,6 +32,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("getAllForSelect")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<RegionSelectDataOut>>>> GetAllRegionsForSelect()
         {
             var result = await _regionApplicationService.GetAllRegionsForSelect();
@@ -34,6 +40,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<RegionDataOut?>>> GetRegionById(int id)
         {
             var result = await _regionApplicationService.GetRegionById(id);
@@ -44,6 +51,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<RegionDataOut?>>> CreateRegion([FromBody] RegionDataIn regionDataIn)
         {
             if (!ModelState.IsValid)
@@ -57,6 +65,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<RegionDataOut?>>> UpdateRegion(int id, [FromBody] RegionDataIn regionDataIn)
         {
             if (!ModelState.IsValid)
@@ -70,6 +79,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<string>>> DeleteRegion(int id)
         {
             var result = await _regionApplicationService.DeleteRegion(id);
@@ -88,6 +98,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("filtered")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<RegionDataOut>>>>> GetRegionsFiltered([FromQuery] RegionFilterRequest filterRequest)
         {
             var result = await _regionApplicationService.GetRegionsFiltered(filterRequest);

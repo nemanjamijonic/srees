@@ -7,9 +7,13 @@ using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
 {
+    /// <summary>
+    /// Kontroler za upravljanje stubovima
+    /// GET: Dostupno svima (Gost, User, Admin)
+    /// POST/PUT/DELETE: Samo Admin
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class PolesController : ControllerBase
     {
         private readonly IPoleApplicationService _poleApplicationService;
@@ -20,6 +24,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<PoleDataOut>>>> GetAllPoles()
         {
             var result = await _poleApplicationService.GetAllPoles();
@@ -27,6 +32,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("getAllForSelect")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<PoleSelectDataOut>>>> GetAllPolesForSelect()
         {
             var result = await _poleApplicationService.GetAllPolesForSelect();
@@ -34,6 +40,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<PoleDataOut?>>> GetPoleById(int id)
         {
             var result = await _poleApplicationService.GetPoleById(id);
@@ -44,6 +51,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<PoleDataOut?>>> CreatePole([FromBody] PoleDataIn poleDataIn)
         {
             if (!ModelState.IsValid)
@@ -57,6 +65,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<PoleDataOut?>>> UpdatePole(int id, [FromBody] PoleDataIn poleDataIn)
         {
             if (!ModelState.IsValid)
@@ -70,10 +79,11 @@ namespace SREES.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<string>>> DeletePole(int id)
         {
             var result = await _poleApplicationService.DeletePole(id);
-            if (result.Data == null && result.Message!.Contains("nije pronadjen"))
+            if (result.Data == null && result.Message!.Contains("nije pronađen"))
                 return NotFound(result);
 
             return Ok(result);
@@ -88,6 +98,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("filtered")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<PoleDataOut>>>>> GetPolesFiltered([FromQuery] PoleFilterRequest filterRequest)
         {
             var result = await _poleApplicationService.GetPolesFiltered(filterRequest);

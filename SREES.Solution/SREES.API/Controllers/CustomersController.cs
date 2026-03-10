@@ -7,9 +7,14 @@ using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
 {
+    /// <summary>
+    /// Kontroler za upravljanje kupcima
+    /// GET: Samo Admin (podaci o kupcima su osetljivi)
+    /// POST/PUT/DELETE: Samo Admin
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerApplicationService _customerApplicationService;

@@ -569,6 +569,74 @@ namespace SREES.DAL.Context
 
                 entity.ToTable("Customers", schema: "dbo");
             });
+
+            // Konfiguracija Notification entiteta
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Title)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(e => e.Message)
+                    .HasMaxLength(1000)
+                    .IsRequired();
+
+                entity.Property(e => e.NotificationType)
+                    .HasConversion<int>();
+
+                entity.Property(e => e.IsRead)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Guid)
+                    .HasDefaultValueSql("NEWID()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasDefaultValueSql("GETDATE()")
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(e => e.UserId)
+                    .HasDatabaseName("IX_Notification_UserId");
+
+                entity.HasIndex(e => e.IsRead)
+                    .HasDatabaseName("IX_Notification_IsRead");
+
+                entity.HasIndex(e => e.OutageId)
+                    .HasDatabaseName("IX_Notification_OutageId");
+
+                entity.HasIndex(e => e.IsDeleted)
+                    .HasDatabaseName("IX_Notification_IsDeleted");
+
+                // Foreign key relationships
+                entity.HasOne(n => n.User)
+                    .WithMany()
+                    .HasForeignKey(n => n.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(n => n.Customer)
+                    .WithMany()
+                    .HasForeignKey(n => n.CustomerId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(n => n.Outage)
+                    .WithMany()
+                    .HasForeignKey(n => n.OutageId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.ToTable("Notifications", schema: "dbo");
+            });
         }
 
         public virtual DbSet<User> Users { get; set; }
@@ -580,6 +648,6 @@ namespace SREES.DAL.Context
         public virtual DbSet<Pole> Poles { get; set; }
         public virtual DbSet<Feeder> Feeders { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
-
+        public virtual DbSet<Notification> Notifications { get; set; }
     }
 }

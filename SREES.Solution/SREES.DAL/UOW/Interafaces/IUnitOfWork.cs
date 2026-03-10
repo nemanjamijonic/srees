@@ -13,5 +13,6 @@ namespace SREES.DAL.UOW.Interafaces
         IBuildingRepository GetBuildingRepository();
         IFeederRepository GetFeederRepository();
         ICustomerRepository GetCustomerRepository();
+        INotificationRepository GetNotificationRepository();
     }
 }

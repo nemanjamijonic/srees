@@ -44,5 +44,15 @@ namespace SREES.Services.Implementations
         {
             return await _outageService.GetOutageStatistics();
         }
+
+        public async Task<ResponsePackage<List<OutageDataOut>>> GetOutagesByFeederId(int feederId)
+        {
+            return await _outageService.GetOutagesByFeederId(feederId);
+        }
+
+        public async Task<ResponsePackage<List<OutageDataOut>>> GetOutagesBySubstationId(int substationId)
+        {
+            return await _outageService.GetOutagesBySubstationId(substationId);
+        }
     }
 }

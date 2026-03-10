@@ -7,9 +7,13 @@ using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
 {
+    /// <summary>
+    /// Kontroler za upravljanje trafo-stanicama
+    /// GET: Dostupno svima (Gost, User, Admin)
+    /// POST/PUT/DELETE: Samo Admin
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class SubstationsController : ControllerBase
     {
         private readonly ISubstationApplicationService _substationApplicationService;
@@ -20,6 +24,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<SubstationDataOut>>>> GetAllSubstations()
         {
             var result = await _substationApplicationService.GetAllSubstations();
@@ -27,6 +32,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("getAllForSelect")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<SubstationSelectDataOut>>>> GetAllSubstationsForSelect()
         {
             var result = await _substationApplicationService.GetAllSubstationsForSelect();
@@ -34,6 +40,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<SubstationDataOut?>>> GetSubstationById(int id)
         {
             var result = await _substationApplicationService.GetSubstationById(id);
@@ -44,6 +51,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<SubstationDataOut?>>> CreateSubstation([FromBody] SubstationDataIn substationDataIn)
         {
             if (!ModelState.IsValid)
@@ -57,6 +65,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<SubstationDataOut?>>> UpdateSubstation(int id, [FromBody] SubstationDataIn substationDataIn)
         {
             if (!ModelState.IsValid)
@@ -70,6 +79,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<string>>> DeleteSubstation(int id)
         {
             var result = await _substationApplicationService.DeleteSubstation(id);
@@ -88,6 +98,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("filtered")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<SubstationDataOut>>>>> GetSubstationsFiltered([FromQuery] SubstationFilterRequest filterRequest)
         {
             var result = await _substationApplicationService.GetSubstationsFiltered(filterRequest);

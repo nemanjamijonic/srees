@@ -7,9 +7,13 @@ using SREES.Services.Interfaces;
 
 namespace SREES.API.Controllers
 {
+    /// <summary>
+    /// Kontroler za upravljanje fiderima (vodovima)
+    /// GET: Dostupno svima (Gost, User, Admin)
+    /// POST/PUT/DELETE: Samo Admin
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class FeedersController : ControllerBase
     {
         private readonly IFeederApplicationService _feederApplicationService;
@@ -20,6 +24,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<FeederDataOut>>>> GetAllFeeders()
         {
             var result = await _feederApplicationService.GetAllFeeders();
@@ -27,6 +32,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("filtered")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<PaginatedResponse<List<FeederDataOut>>>>> GetFeedersFiltered([FromQuery] FeederFilterRequest filterRequest)
         {
             var result = await _feederApplicationService.GetFeedersFiltered(filterRequest);
@@ -34,6 +40,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("select")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<List<FeederSelectDataOut>>>> GetAllFeedersForSelect()
         {
             var result = await _feederApplicationService.GetAllFeedersForSelect();
@@ -41,6 +48,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponsePackage<FeederDataOut?>>> GetFeederById(int id)
         {
             var result = await _feederApplicationService.GetFeederById(id);
@@ -51,6 +59,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<FeederDataOut?>>> CreateFeeder([FromBody] FeederDataIn feederDataIn)
         {
             if (!ModelState.IsValid)
@@ -64,6 +73,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<FeederDataOut?>>> UpdateFeeder(int id, [FromBody] FeederDataIn feederDataIn)
         {
             if (!ModelState.IsValid)
@@ -77,6 +87,7 @@ namespace SREES.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ResponsePackage<string>>> DeleteFeeder(int id)
         {
             var result = await _feederApplicationService.DeleteFeeder(id);
