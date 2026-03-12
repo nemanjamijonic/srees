@@ -29,8 +29,6 @@ artifacts/
 ## ASP.NET temp files
 wwwroot/lib/
 wwwroot/packages/
-appsettings*.json
-appsettings.Development.json
 
 ## Others
 *.db
